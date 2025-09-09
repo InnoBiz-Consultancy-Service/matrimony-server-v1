@@ -1,7 +1,7 @@
 import express from "express";
 import { USER_ROLE } from "../../../types/global";
 import { InterestControllers } from "./intereset.controller";
-import auth from "../../../middlewares/auth";
+import auth from "../../../middlewares/checkAuth";
 
 
 const router = express.Router();

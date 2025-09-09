@@ -4,6 +4,7 @@ import { UserServices } from "./user.service";
 import { sendResponse } from "../../../utils/sendResponse";
 import { BiodataServices } from "../biodata/biodata.service";
 import { setAuthCookie } from "../../../utils/setCookie";
+import Payment from "../payment/payment.model";
 
 // Registration
 export const registerUser = async (req: Request, res: Response) => {
@@ -31,7 +32,7 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 };
 
-// Login
+
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -47,8 +48,13 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const user = await UserServices.loginUserFromDB({ email, password });
 
-    // Check if user has biodata
     const hasBiodata = !!(await BiodataServices.getOwnBiodata(user._id as string));
+
+    const latestPayment = await Payment.findOne({ userId: user._id })
+      .sort({ paymentDate: -1 }) 
+      .lean();
+
+    const subscriptionType = latestPayment?.subscriptionType || "free";
 
     // Create JWT token
     const accessToken = jwt.sign(
@@ -59,6 +65,7 @@ export const loginUser = async (req: Request, res: Response) => {
         gender: user.gender,
         role: user.role,
         hasBiodata,
+        subscriptionType, 
       },
       process.env.JWT_SECRET || "defaultsecret",
       { expiresIn: "24h" }
@@ -78,6 +85,7 @@ export const loginUser = async (req: Request, res: Response) => {
         gender: user.gender,
         role: user.role,
         hasBiodata,
+        subscriptionType,
         token: accessToken,
       },
     });
@@ -90,6 +98,7 @@ export const loginUser = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 // Logout
 export const logoutUser = async (req: Request, res: Response) => {

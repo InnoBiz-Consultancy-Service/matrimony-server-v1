@@ -101,7 +101,12 @@
 // }
 
 import { Types } from "mongoose";
-
+ 
+export enum ApprovalStatus {
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+}
 export interface IBiodata {
   _id?: string | Types.ObjectId;
   userId: Types.ObjectId;
@@ -198,7 +203,7 @@ export interface IBiodata {
     informationAccurate?: boolean | string;
     nikahResponsibility?: boolean | string;
   };
-
+ isApproved?: ApprovalStatus;
   createdAt?: Date;
   updatedAt?: Date;
 }

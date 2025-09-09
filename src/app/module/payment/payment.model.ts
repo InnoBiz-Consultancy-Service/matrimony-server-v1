@@ -13,7 +13,7 @@ const paymentSchema = new Schema<IPayment>(
     paymentDate: { type: Date, default: Date.now },
     additionalNotes: { type: String },
     approvalStatus: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
-    subscriptionType: { type: String, enum: ["premium", "vip"], required: true },
+    subscriptionType: { type: String, enum: ["premium", "vip","free"], required: true },
     durationInMonths: { type: Number, required: true },
 
   },

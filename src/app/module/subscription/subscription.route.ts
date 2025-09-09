@@ -1,7 +1,7 @@
 import express from "express";
 import { SubscriptionControllers } from "./subscription.controller";
 import { USER_ROLE } from "../../../types/global";
-import auth from "../../../middlewares/auth";
+import auth from "../../../middlewares/checkAuth";
 import catchAsync from "../../../utils/catchAsync";
 
 

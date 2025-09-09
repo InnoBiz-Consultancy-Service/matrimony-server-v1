@@ -109,7 +109,7 @@
 // export default Biodata;
 
 import { Schema, model } from "mongoose";
-import { IBiodata } from "./biodata.interface";
+import { ApprovalStatus, IBiodata } from "./biodata.interface";
 
 const biodataSchema = new Schema<IBiodata>(
   {
@@ -204,7 +204,7 @@ const biodataSchema = new Schema<IBiodata>(
       financialCondition: { type: String, default: "উত্তর দেয়া হয়নি" },
       qualities: [{ type: String }],
     },
-
+    isApproved: { type: String, enum: ApprovalStatus, default: ApprovalStatus.PENDING },
     pledge: {
       parentsAware: { type: Schema.Types.Mixed, default: false },
       informationAccurate: { type: Schema.Types.Mixed, default: false },

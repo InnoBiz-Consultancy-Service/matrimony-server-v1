@@ -1,189 +1,131 @@
+// biodata.controller.ts
 import { Request, Response } from "express";
 import { BiodataServices } from "./biodata.service";
+import httpStatus from "http-status-codes";
+import { ApprovalStatus } from "./biodata.interface";
 import { sendResponse } from "../../../utils/sendResponse";
 
+// Create or update own biodata
 const createOrUpdateBiodata = async (req: Request, res: Response) => {
-  try {
-    const userId = req.user?.userId as string;
-    const data = { ...req.body, userId };
+  const userId = req.user?.userId;
+  const data = req.body;
 
-    const biodata = await BiodataServices.createOrUpdateBiodata(data, userId);
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: "Biodata saved successfully",
-      data: biodata,
-    });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: 500,
-      success: false,
-      message: error.message || "Failed to save biodata",
-      data: null,
-    });
-  }
+  const result = await BiodataServices.createOrUpdateBiodata(data, userId!);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Biodata created/updated successfully",
+    data: result,
+  });
 };
 
+// Update own biodata
 const updateOwnBiodata = async (req: Request, res: Response) => {
-  try {
-    const userId = req.user?.userId as string;
-    const updateData = req.body;
+  const userId = req.user?.userId;
+  const updateData = req.body;
 
-    const updated = await BiodataServices.updateOwnBiodata(userId, updateData);
+  const updatedBiodata = await BiodataServices.updateOwnBiodata(
+    userId!,
+    updateData
+  );
 
-    if (!updated) {
-      return sendResponse(res, {
-        statusCode: 404,
-        success: false,
-        message: "Biodata not found",
-        data: null,
-      });
-    }
-
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: "Own biodata updated successfully",
-      data: updated,
-    });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: 500,
-      success: false,
-      message: error.message || "Failed to update biodata",
-      data: null,
-    });
-  }
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Biodata updated successfully",
+    data: updatedBiodata,
+  });
 };
 
+// Get all approved biodata
 const getAllBiodata = async (req: Request, res: Response) => {
-  try {
-    const filters = req.query;
-    const biodatas = await BiodataServices.getAllBiodata(filters);
+  const filters = req.query;
+  const result = await BiodataServices.getAllBiodata(filters);
 
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: "All biodata fetched successfully",
-      data: biodatas,
-    });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: 500,
-      success: false,
-      message: error.message || "Failed to fetch biodata",
-      data: null,
-    });
-  }
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All approved biodata fetched successfully",
+    data: result,
+  });
 };
 
-const getBiodataById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const biodata = await BiodataServices.getBiodataById(id);
-
-    if (!biodata) {
-      return sendResponse(res, {
-        statusCode: 404,
-        success: false,
-        message: "Biodata not found",
-        data: null,
-      });
-    }
-
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: "Biodata fetched successfully",
-      data: biodata,
-    });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: 500,
-      success: false,
-      message: error.message || "Failed to fetch biodata",
-      data: null,
-    });
-  }
-};
-
-const updateBiodataById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const updateData = req.body;
-
-    const updated = await BiodataServices.updateBiodataById(id, updateData);
-
-    if (!updated) {
-      return sendResponse(res, {
-        statusCode: 404,
-        success: false,
-        message: "Biodata not found",
-        data: null,
-      });
-    }
-
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: "Biodata updated successfully",
-      data: updated,
-    });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: 500,
-      success: false,
-      message: error.message || "Failed to update biodata",
-      data: null,
-    });
-  }
-};
-
+// Get own biodata
 const getOwnBiodata = async (req: Request, res: Response) => {
-  try {
-    const userId = req.user?.userId as string;
+  const userId = req.user?.userId;
+  const result = await BiodataServices.getOwnBiodata(userId!);
 
-    if (!userId) {
-      return sendResponse(res, {
-        statusCode: 401,
-        success: false,
-        message: "Unauthorized",
-        data: null,
-      });
-    }
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Your biodata fetched successfully",
+    data: result,
+  });
+};
 
-    const biodata = await BiodataServices.getOwnBiodata(userId);
+// Get biodata by id (admin)
+const getBiodataById = async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const result = await BiodataServices.getBiodataById(userId);
 
-    if (!biodata) {
-      return sendResponse(res, {
-        statusCode: 404,
-        success: false,
-        message: "No biodata found for this user",
-        data: null,
-      });
-    }
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Biodata fetched successfully",
+    data: result,
+  });
+};
 
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: "Own biodata fetched successfully",
-      data: biodata,
-    });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: 500,
+// Approve or reject biodata (admin)
+const approveOrRejectBiodata = async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const { status } = req.body; 
+
+  if (!Object.values(ApprovalStatus).includes(status)) {
+    return sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
       success: false,
-      message: error.message || "Failed to fetch own biodata",
+      message: "Invalid status value",
       data: null,
     });
   }
+
+  const updatedBiodata = await BiodataServices.approveOrRejectBiodata(id, status);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Biodata ${status} successfully`,
+    data: updatedBiodata,
+  });
+};
+
+// Get all pending biodata (admin)
+const getPendingBiodata = async (req: Request, res: Response) => {
+  const filters = req.query;
+  const pendingStatus = ApprovalStatus.PENDING;
+
+  // add pending status filter
+  const result = await BiodataServices.getAllBiodata({
+    ...filters,
+    approvalStatus: pendingStatus,
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Pending biodata fetched successfully",
+    data: result,
+  });
 };
 
 export const BiodataControllers = {
   createOrUpdateBiodata,
   updateOwnBiodata,
   getAllBiodata,
-  getBiodataById,
-  updateBiodataById,
   getOwnBiodata,
+  getBiodataById,
+  approveOrRejectBiodata,
+  getPendingBiodata,
 };
