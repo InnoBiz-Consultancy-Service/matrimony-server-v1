@@ -2,8 +2,10 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 
 import cookieParser from "cookie-parser";
-import router from "./app/routers";
-import globalErrorHandler from "./app/middlewares/globalErrorHandler";
+import router from "./routers";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler";
+
+
 console.log("App starting...");
 
 const app = express();
@@ -19,7 +21,7 @@ app.use(
     credentials: true,
   })
 );
-app.use("/api", router);
+app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
   res.send({ message: "Alhamdulilah Server is running...." });

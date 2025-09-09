@@ -14,6 +14,7 @@ export interface IUser {
   agreeToPrivacy: boolean;
   agreeToTerms: boolean;
   isVerified?: boolean;
+  hasBiodata?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

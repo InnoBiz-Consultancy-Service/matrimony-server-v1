@@ -1,18 +1,33 @@
 import Biodata from "./biodata.model";
 import { IBiodata } from "./biodata.interface";
 import mongoose from "mongoose";
-
-const createOrUpdateBiodata = async (data: IBiodata) => {
-  const existing = await Biodata.findOne({ userId: data.userId });
-  if (existing) {
-    return await Biodata.findOneAndUpdate({ userId: data.userId }, data, {
-      new: true,
-    });
-  } else {
-    const biodata = new Biodata(data);
-    return await biodata.save();
+import jwt from "jsonwebtoken";
+import User from "../user/user.model";
+import { createUserTokens } from "../../../utils/userToken";
+const createOrUpdateBiodata = async (data: IBiodata, userId: string) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error("User does not exist. Cannot create biodata.");
   }
+
+  // 2. Create or update biodata
+  let biodata = await Biodata.findOne({ userId });
+  if (biodata) {
+    biodata = await Biodata.findOneAndUpdate({ userId }, data, { new: true });
+  } else {
+    const newBiodata = new Biodata({ ...data, userId });
+    biodata = await newBiodata.save();
+  }
+
+
+  const { accessToken } = createUserTokens({
+    ...user.toObject(),
+    hasBiodata: true,
+  });
+
+  return { biodata, accessToken };
 };
+
 
 const updateOwnBiodata = async (
   userId: string,

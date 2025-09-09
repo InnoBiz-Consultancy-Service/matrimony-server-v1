@@ -3,9 +3,10 @@ import { NextFunction, Request, Response } from "express";
 import catchAsync from "../utils/catchAsync";
 
 import jwt, { JwtPayload } from "jsonwebtoken";
-import config from "../config";
-import User from "../module/user/user.model";
+
 import AppError from "../errors/AppError";
+import { envVars } from "../config/envConfig";
+import User from "../app/module/user/user.model";
 
 // const auth = (...requiredRoles: TUserRole[]) => {
 //     return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -46,7 +47,7 @@ const auth = (...requiredRoles: string[]) => {
 
     let decode;
     try {
-      decode = jwt.verify(token, config.jwt_secret as string) as JwtPayload;
+      decode = jwt.verify(token, envVars.JWT_ACCESS_SECRET as string) as JwtPayload;
     } catch (err) {
       throw new AppError(401, "You are not authorized.Update your token.");
     }
