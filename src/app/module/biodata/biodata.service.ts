@@ -1,5 +1,5 @@
 import Biodata from "./biodata.model";
-import { IBiodata } from "./biodata.interface";
+import { ApprovalStatus, IBiodata } from "./biodata.interface";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import User from "../user/user.model";
@@ -13,7 +13,11 @@ const createOrUpdateBiodata = async (data: IBiodata, userId: string) => {
   // 2. Create or update biodata
   let biodata = await Biodata.findOne({ userId });
   if (biodata) {
-    biodata = await Biodata.findOneAndUpdate({ userId }, data, { new: true });
+   biodata = await Biodata.findOneAndUpdate(
+      { userId },
+      { ...data, isApproved: ApprovalStatus.PENDING }, 
+      { new: true }
+    );
   } else {
     const newBiodata = new Biodata({ ...data, userId });
     biodata = await newBiodata.save();
@@ -38,6 +42,9 @@ const updateOwnBiodata = async (
 
 const getAllBiodata = async (filters: any) => {
   const conditions: any[] = [];
+
+  // ✅ Default condition: only approved biodata
+  conditions.push({ approvalStatus: "approved" });
 
   // Name filter
   if (filters.name && filters.name.trim() !== "") {
@@ -143,7 +150,8 @@ const getAllBiodata = async (filters: any) => {
     }
   });
 
-  const query = conditions.length > 0 ? { $and: conditions } : {};
+  // ✅ Final query (always checks approvalStatus true)
+  const query = { $and: conditions };
 
   const result = await Biodata.find(query).populate(
     "userId",
@@ -152,6 +160,7 @@ const getAllBiodata = async (filters: any) => {
   return result;
 };
 
+
 const getBiodataById = async (userId: string) => {
   return await Biodata.findOne({ userId }).populate(
     "userId",
@@ -159,9 +168,26 @@ const getBiodataById = async (userId: string) => {
   );
 };
 
-const updateBiodataById = async (id: string, updateData: Partial<IBiodata>) => {
-  return await Biodata.findByIdAndUpdate(id, updateData, { new: true });
+const approveOrRejectBiodata = async (id: string, status: ApprovalStatus) => {
+  if (![ApprovalStatus.APPROVED, ApprovalStatus.REJECTED].includes(status)) {
+    throw new Error("Invalid status. Must be 'approved' or 'rejected'");
+  }
+
+  return await Biodata.findByIdAndUpdate(
+    id,
+    { isApproved: status },
+    { new: true }
+  );
 };
+
+// Get pending biodata
+const getPendingBiodata = async () => {
+  return await Biodata.find({ isApproved: ApprovalStatus.PENDING }).populate(
+    "userId",
+    "username email role phone"
+  );
+};
+
 const getOwnBiodata = async (userId: string) => {
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     throw new Error("Invalid user ID");
@@ -177,6 +203,7 @@ export const BiodataServices = {
   updateOwnBiodata,
   getAllBiodata,
   getBiodataById,
-  updateBiodataById,
+  approveOrRejectBiodata,
+  getPendingBiodata,
   getOwnBiodata,
 };

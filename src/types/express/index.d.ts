@@ -1,20 +1,10 @@
-import { Request } from "express";
+import 'express';
+import { AuthUser } from '../../middlewares/checkAuth';
 
-declare module "express" {
-  export interface Request {
-    user?: {
-      userId: string;
-      username?: string;
-      role?: string;
-      email?:string;
-    };
+declare global {
+  namespace Express {
+    interface Request {
+      user?: AuthUser;
+    }
   }
-}
-export interface AuthRequest extends Request {
-  user: {
-    userId: string;
-    username?: string;
-    role?: string;
-    email?:string;
-  };
 }

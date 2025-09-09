@@ -1,60 +1,59 @@
+// biodata.routes.ts
 import express from "express";
-// import { biodataSchema } from "./biodata.validation";
 import { BiodataControllers } from "./biodata.controller";
 import { USER_ROLE } from "../../../types/global";
-import auth from "../../../middlewares/auth";
+import auth from "../../../middlewares/checkAuth";
 import catchAsync from "../../../utils/catchAsync";
 
 const router = express.Router();
 
-// user own biodata create or update
+// User own biodata create or update
 router.post(
   "/",
   auth(USER_ROLE.USER),
   catchAsync(BiodataControllers.createOrUpdateBiodata)
 );
 
-// router.post(
-//   "/",
-//   auth(USER_ROLE.USER),
-//   (req, res, next) => {
-//     console.log("👉 Request Body:", req.body);
-//     next();
-//   },
-//   // validateRequest(biodataSchema),
-//   catchAsync(BiodataControllers.createOrUpdateBiodata)
-// );
-
-
-// user own biodata update
+// User own biodata update
 router.patch(
   "/",
   auth(USER_ROLE.USER),
-  // validateRequest(biodataSchema),
   catchAsync(BiodataControllers.updateOwnBiodata)
 );
 
-// get all biodata (admin or user)
-router.get("/", catchAsync(BiodataControllers.getAllBiodata));
-// get own biodata (only the logged in user's)
+// Get all approved biodata (admin or user)
+router.get(
+  "/all",
+  auth(USER_ROLE.ADMIN),
+  catchAsync(BiodataControllers.getAllBiodata)
+);
+
+// Get own biodata (logged in user)
 router.get(
   "/my-biodata",
   auth(USER_ROLE.USER),
   catchAsync(BiodataControllers.getOwnBiodata)
 );
-// get biodata by id
+
+// Get biodata by userId (admin only)
 router.get(
   "/:id",
-  auth(USER_ROLE.USER),
+  auth(USER_ROLE.ADMIN),
   catchAsync(BiodataControllers.getBiodataById)
 );
 
-// update biodata by id
+// Approve or reject biodata (admin only)
 router.patch(
-  "/:id",
-  auth(USER_ROLE.USER),
-  // validateRequest(biodataSchema),
-  catchAsync(BiodataControllers.updateBiodataById)
+  "/:id/approval",
+  auth(USER_ROLE.ADMIN),
+  catchAsync(BiodataControllers.approveOrRejectBiodata)
+);
+
+// Get all pending biodata (admin only)
+router.get(
+  "/pending",
+  auth(USER_ROLE.ADMIN),
+  catchAsync(BiodataControllers.getPendingBiodata)
 );
 
 export const BiodataRoutes = router;

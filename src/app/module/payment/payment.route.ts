@@ -3,7 +3,7 @@ import express from "express";
 import { USER_ROLE } from "../../../types/global";
 import { approvePayment, createPayment, getAllPayments } from "./payment.controller";
 import catchAsync from "../../../utils/catchAsync";
-import auth from "../../../middlewares/auth";
+import auth from "../../../middlewares/checkAuth";
 
 
 const router = express.Router();
