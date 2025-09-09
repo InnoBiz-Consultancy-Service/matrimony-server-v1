@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { UserRoutes } from "../module/user/user.route";
+import { UserRoutes } from "../app/module/user/user.route";
+import { BiodataRoutes } from "../app/module/biodata/biodata.route";
+import { sendOtp, verifyOtp } from "../app/controllers/OTPSend";
+import { paymentRoutes } from "../app/module/payment/payment.route";
+import { Interest } from "../app/module/interest/interest.route";
 
-import { BiodataRoutes } from "../module/biodata/biodata.route";
-import { sendOtp, verifyOtp } from "../controllers/OTPSend";
-import { paymentRoutes } from "../module/payment/payment.route";
-import { Interest } from "../module/interest/interest.route";
+
 const router = Router();
 
 const moduleROuters = [

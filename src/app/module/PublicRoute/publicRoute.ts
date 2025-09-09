@@ -1,7 +1,8 @@
 // routes/location.routes.ts
 import express, { Request, Response } from "express";
 import mongoose from "mongoose";
-import catchAsync from "../../utils/catchAsync";
+import catchAsync from "../../../utils/catchAsync";
+
 
 const router = express.Router();
 

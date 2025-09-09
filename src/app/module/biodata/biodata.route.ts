@@ -1,10 +1,9 @@
 import express from "express";
-import auth from "../../middlewares/auth";
 // import { biodataSchema } from "./biodata.validation";
 import { BiodataControllers } from "./biodata.controller";
-import catchAsync from "../../utils/catchAsync";
-import { validateRequest } from "../../utils/validateRequest";
 import { USER_ROLE } from "../../../types/global";
+import auth from "../../../middlewares/auth";
+import catchAsync from "../../../utils/catchAsync";
 
 const router = express.Router();
 

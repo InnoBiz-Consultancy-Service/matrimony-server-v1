@@ -1,4 +1,6 @@
-import { transporter } from "../config/mailer";
+
+import { transporter } from "../../config/mailer";
+
 
 export const sendOtpEmail = async (to: string, otp: string) => {
   const mailOptions = {

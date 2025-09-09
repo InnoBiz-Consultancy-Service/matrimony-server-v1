@@ -1,19 +1,76 @@
+/* eslint-disable no-console */
+import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
-import config from "./app/config";
+import { envVars } from "./config/envConfig";
 
 
-async function server() {
-  try {
-    await mongoose.connect(config.database_url as string);
-    console.log('Connected to mongodb database');
-    app.listen(config.port, () => {
-      console.log(`Server is running on ${config.port}`);
-    });
-  } catch (err) {
-    console.log(err);
-  }
+let server: Server;
+
+
+const startServer = async () => {
+    try {
+        await mongoose.connect(envVars.DB_URL)
+
+        console.log("Connected to DB!!");
+
+        server = app.listen(envVars.PORT, () => {
+            console.log(`Server is listening to port ${envVars.PORT}`);
+        });
+    } catch (error) {
+        console.log(error);
+    }
 }
 
+startServer()
 
-server();
+process.on("SIGTERM", () => {
+    console.log("SIGTERM signal recieved... Server shutting down..");
+
+    if (server) {
+        server.close(() => {
+            process.exit(1)
+        });
+    }
+
+    process.exit(1)
+})
+
+process.on("SIGINT", () => {
+    console.log("SIGINT signal recieved... Server shutting down..");
+
+    if (server) {
+        server.close(() => {
+            process.exit(1)
+        });
+    }
+
+    process.exit(1)
+})
+
+
+process.on("unhandledRejection", (err) => {
+    console.log("Unhandled Rejecttion detected... Server shutting down..", err);
+
+    if (server) {
+        server.close(() => {
+            process.exit(1)
+        });
+    }
+
+    process.exit(1)
+})
+
+process.on("uncaughtException", (err) => {
+    console.log("Uncaught Exception detected... Server shutting down..", err);
+
+    if (server) {
+        server.close(() => {
+            process.exit(1)
+        });
+    }
+
+    process.exit(1)
+})
+
+

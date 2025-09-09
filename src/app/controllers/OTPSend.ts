@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { generateOTP } from '../utils/generateOTP';
 import { sendOtpEmail } from '../services/emailService';
 import { OtpModel } from '../module/otp/OtpModel';
+import { generateOTP } from '../../utils/generateOTP';
 
 // ✅ Send OTP
 export const sendOtp = async (req: Request, res: Response) => {

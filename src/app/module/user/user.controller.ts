@@ -1,74 +1,108 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { UserServices } from "./user.service";
-import { sendResponse } from "../../utils/sendResponse";
+import { sendResponse } from "../../../utils/sendResponse";
+import { BiodataServices } from "../biodata/biodata.service";
+import { setAuthCookie } from "../../../utils/setCookie";
 
+// Registration
 export const registerUser = async (req: Request, res: Response) => {
   try {
     const user = await UserServices.registerUserIntoDB(req.body);
-    res.status(201).json({ message: "User registered successfully", data: user, userId: user._id });
+
+    sendResponse(res, {
+      statusCode: 201,
+      success: true,
+      message: "User registered successfully",
+      data: {
+        userId: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+    });
   } catch (error: any) {
-    res.status(400).json({ message: error.message || "User registration failed" });
+    sendResponse(res, {
+      statusCode: 400,
+      success: false,
+      message: error.message || "User registration failed",
+      data: null,
+    });
   }
 };
 
+// Login
 export const loginUser = async (req: Request, res: Response) => {
   try {
-    let token = req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
-    if (token) {
-      try {
-        jwt.verify(token, process.env.JWT_SECRET || "defaultsecret");
-        return res.status(400).json({ message: "You are already logged in" });
-      } catch {
-        // Invalid token - continue to login
-      }
-    }
-
     const { email, password } = req.body;
 
-    if (!password || !email) {
-      return res.status(400).json({
-        message: "Email and password must be provided",
+    if (!email || !password) {
+      return sendResponse(res, {
+        statusCode: 400,
+        success: false,
+        message: "Email and password required",
+        data: null,
       });
     }
 
     const user = await UserServices.loginUserFromDB({ email, password });
 
-    const newToken = jwt.sign(
+    // Check if user has biodata
+    const hasBiodata = !!(await BiodataServices.getOwnBiodata(user._id as string));
+
+    // Create JWT token
+    const accessToken = jwt.sign(
       {
         userId: user._id,
         name: user.name,
         userEmail: user.email,
         gender: user.gender,
-        role: user.role
+        role: user.role,
+        hasBiodata,
       },
       process.env.JWT_SECRET || "defaultsecret",
       { expiresIn: "24h" }
     );
 
-    res.cookie("accessToken", newToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 24 * 60 * 60 * 1000,
+    // Set cookie using utility
+    setAuthCookie(res, { accessToken });
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Login successful",
+      data: {
+        userId: user._id,
+        name: user.name,
+        email: user.email,
+        gender: user.gender,
+        role: user.role,
+        hasBiodata,
+        token: accessToken,
+      },
     });
-
-    res.status(200).json({ token: newToken, message: "Login successful" });
   } catch (error: any) {
-    res.status(401).json({ message: error.message || "Login failed" });
+    sendResponse(res, {
+      statusCode: 401,
+      success: false,
+      message: error.message || "Login failed",
+      data: null,
+    });
   }
 };
 
+// Logout
 export const logoutUser = async (req: Request, res: Response) => {
-  const token = req.cookies?.accessToken;
-  if (!token) {
-    return res.status(201).json({ message: "Already logged out" });
-  }
   res.clearCookie("accessToken");
-  res.status(200).json({ message: "Logout successful" });
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Logout successful",
+    data: null,
+  });
 };
 
+// Verify user (admin or superuser route)
 const verifyUser = async (req: Request, res: Response) => {
   const userId = req.params.id;
 
@@ -81,9 +115,10 @@ const verifyUser = async (req: Request, res: Response) => {
     data: updatedUser,
   });
 };
+
 export const UserControllers = {
   registerUser,
   loginUser,
   logoutUser,
-  verifyUser
+  verifyUser,
 };

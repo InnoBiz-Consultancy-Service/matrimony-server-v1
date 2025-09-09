@@ -1,8 +1,9 @@
 import express from "express";
-import auth from "../../middlewares/auth";
 import { SubscriptionControllers } from "./subscription.controller";
 import { USER_ROLE } from "../../../types/global";
-import catchAsync from "../../utils/catchAsync";
+import auth from "../../../middlewares/auth";
+import catchAsync from "../../../utils/catchAsync";
+
 
 const router = express.Router();
 

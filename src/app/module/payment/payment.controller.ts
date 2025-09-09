@@ -1,51 +1,83 @@
-
 import { Request, Response } from "express";
 import { PaymentServices } from "./payment.service";
 import mongoose from "mongoose";
 import Payment from "./payment.model";
+import { sendResponse } from "../../../utils/sendResponse";
 
 export const createPayment = async (req: Request, res: Response) => {
   try {
     const result = await PaymentServices.createPayment(req.body);
-    res.status(201).json({
+    sendResponse(res, {
+      statusCode: 201,
       success: true,
       message: "Payment created successfully",
       data: result,
     });
-  } catch (error:any) {
-    res.status(500).json({ success: false, message: error?.message });
+  } catch (error: any) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: error?.message || "Payment creation failed",
+      data: null,
+    });
   }
 };
 
 export const approvePayment = async (req: Request, res: Response) => {
   try {
-    const paymentId = req.params.id; // match the route
-     if (!mongoose.Types.ObjectId.isValid(paymentId)) {
-    throw new Error("Invalid payment ID");
-  }
+    const paymentId = req.params.id;
 
-  const payment = await Payment.findById(paymentId);
-  if (!payment) throw new Error("Payment not found");
+    if (!mongoose.Types.ObjectId.isValid(paymentId)) {
+      return sendResponse(res, {
+        statusCode: 400,
+        success: false,
+        message: "Invalid payment ID",
+        data: null,
+      });
+    }
+
+    const payment = await Payment.findById(paymentId);
+    if (!payment) {
+      return sendResponse(res, {
+        statusCode: 404,
+        success: false,
+        message: "Payment not found",
+        data: null,
+      });
+    }
+
     const result = await PaymentServices.approvePayment(paymentId);
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Payment approved and subscription created",
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: error.message || "Payment approval failed",
+      data: null,
+    });
   }
 };
 
 export const getAllPayments = async (_req: Request, res: Response) => {
   try {
     const result = await PaymentServices.getAllPayments();
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "All payments retrieved",
       data: result,
     });
-  } catch (error:any) {
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error: any) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: error.message || "Failed to fetch payments",
+      data: null,
+    });
   }
 };

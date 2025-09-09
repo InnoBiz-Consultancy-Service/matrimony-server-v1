@@ -1,9 +1,9 @@
 
 import express from "express";
-import auth from "../../middlewares/auth";
 import { USER_ROLE } from "../../../types/global";
-import catchAsync from "../../utils/catchAsync";
 import { approvePayment, createPayment, getAllPayments } from "./payment.controller";
+import catchAsync from "../../../utils/catchAsync";
+import auth from "../../../middlewares/auth";
 
 
 const router = express.Router();
