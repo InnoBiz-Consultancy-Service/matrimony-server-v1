@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import { SubscriptionServices } from "./subscription.service";
 import { sendResponse } from "../../../utils/sendResponse";
+import catchAsync from "../../../utils/catchAsync";
 const createSubscription = async (req: Request, res: Response) => {
   try {
     const { type, durationInMonths, profileViewLimit } = req.body;
@@ -34,6 +35,7 @@ const createSubscription = async (req: Request, res: Response) => {
 const activateSubscription = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+
     const subscription = await SubscriptionServices.activateSubscription(id);
 
     sendResponse(res, {
@@ -101,10 +103,21 @@ const getSubscriptionById = async (req: Request, res: Response) => {
     });
   }
 };
+const expireSubscription = catchAsync(async (req: Request, res: Response) => {
+  const id  = req.params.id;
+  const subscription = await SubscriptionServices.expireSubscription(id);
 
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Subscription expired successfully",
+    data: subscription,
+  });
+});
 export const SubscriptionControllers = {
   createSubscription,
   activateSubscription,
   getAllSubscriptions,
   getSubscriptionById,
+  expireSubscription,
 };

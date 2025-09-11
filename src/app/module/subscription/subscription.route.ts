@@ -9,8 +9,7 @@ const router = express.Router();
 
 router.post("/create", auth(USER_ROLE.USER), SubscriptionControllers.createSubscription);
 
-// activate subscription after payment success (admin or payment callback)
-router.patch("/activate/:id", auth(USER_ROLE.ADMIN), SubscriptionControllers.activateSubscription);
+
 
 // get all subscriptions - admin only
 router.get("/all", auth(USER_ROLE.ADMIN), SubscriptionControllers.getAllSubscriptions);
@@ -18,4 +17,9 @@ router.get("/all", auth(USER_ROLE.ADMIN), SubscriptionControllers.getAllSubscrip
 // get single subscription by id - admin only
 router.get("/:id", auth(USER_ROLE.ADMIN), catchAsync(SubscriptionControllers.getSubscriptionById));
 
-export default router;
+// activate subscription after payment success (admin or payment callback)
+router.patch("/activate/:id", auth(USER_ROLE.ADMIN), SubscriptionControllers.activateSubscription);
+
+router.patch("/expire/:id", auth(USER_ROLE.ADMIN), SubscriptionControllers.expireSubscription);
+
+export const subscriptionRoutes =  router;

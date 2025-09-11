@@ -1,12 +1,12 @@
-// biodata.controller.ts
 import { Request, Response } from "express";
 import { BiodataServices } from "./biodata.service";
 import httpStatus from "http-status-codes";
 import { ApprovalStatus } from "./biodata.interface";
 import { sendResponse } from "../../../utils/sendResponse";
+import catchAsync from "../../../utils/catchAsync";
 
 // Create or update own biodata
-const createOrUpdateBiodata = async (req: Request, res: Response) => {
+const createOrUpdateBiodata = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   const data = req.body;
 
@@ -18,10 +18,10 @@ const createOrUpdateBiodata = async (req: Request, res: Response) => {
     message: "Biodata created/updated successfully",
     data: result,
   });
-};
+});
 
 // Update own biodata
-const updateOwnBiodata = async (req: Request, res: Response) => {
+const updateOwnBiodata = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   const updateData = req.body;
 
@@ -36,12 +36,14 @@ const updateOwnBiodata = async (req: Request, res: Response) => {
     message: "Biodata updated successfully",
     data: updatedBiodata,
   });
-};
+});
 
 // Get all approved biodata
-const getAllBiodata = async (req: Request, res: Response) => {
+const getAllBiodata = catchAsync(async (req: Request, res: Response) => {
   const filters = req.query;
-  const result = await BiodataServices.getAllBiodata(filters);
+  const currentUserId = req.user?.userId;
+
+  const result = await BiodataServices.getAllBiodata(filters, currentUserId!);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -49,10 +51,10 @@ const getAllBiodata = async (req: Request, res: Response) => {
     message: "All approved biodata fetched successfully",
     data: result,
   });
-};
+});
 
 // Get own biodata
-const getOwnBiodata = async (req: Request, res: Response) => {
+const getOwnBiodata = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   const result = await BiodataServices.getOwnBiodata(userId!);
 
@@ -62,12 +64,13 @@ const getOwnBiodata = async (req: Request, res: Response) => {
     message: "Your biodata fetched successfully",
     data: result,
   });
-};
+});
 
-// Get biodata by id (admin)
-const getBiodataById = async (req: Request, res: Response) => {
-  const userId = req.params.id;
-  const result = await BiodataServices.getBiodataById(userId);
+const getBiodataById = catchAsync(async (req: Request, res: Response) => {
+  const biodataId = req.params.id; 
+  const currentUserId = req.user?.userId;
+
+  const result = await BiodataServices.getBiodataById(biodataId, currentUserId!);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -75,13 +78,13 @@ const getBiodataById = async (req: Request, res: Response) => {
     message: "Biodata fetched successfully",
     data: result,
   });
-};
+});
 
 // Approve or reject biodata (admin)
-const approveOrRejectBiodata = async (req: Request, res: Response) => {
+const approveOrRejectBiodata = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const { status } = req.body; 
-
+  let { status } = req.body;
+  status = status.toLowerCase();
   if (!Object.values(ApprovalStatus).includes(status)) {
     return sendResponse(res, {
       statusCode: httpStatus.BAD_REQUEST,
@@ -99,18 +102,11 @@ const approveOrRejectBiodata = async (req: Request, res: Response) => {
     message: `Biodata ${status} successfully`,
     data: updatedBiodata,
   });
-};
+});
 
 // Get all pending biodata (admin)
-const getPendingBiodata = async (req: Request, res: Response) => {
-  const filters = req.query;
-  const pendingStatus = ApprovalStatus.PENDING;
-
-  // add pending status filter
-  const result = await BiodataServices.getAllBiodata({
-    ...filters,
-    approvalStatus: pendingStatus,
-  });
+const getPendingBiodata = catchAsync(async (req: Request, res: Response) => {
+  const result = await BiodataServices.getPendingBiodata();
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -118,7 +114,7 @@ const getPendingBiodata = async (req: Request, res: Response) => {
     message: "Pending biodata fetched successfully",
     data: result,
   });
-};
+});
 
 export const BiodataControllers = {
   createOrUpdateBiodata,

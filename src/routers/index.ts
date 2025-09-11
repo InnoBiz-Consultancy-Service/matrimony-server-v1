@@ -5,6 +5,7 @@ import { sendOtp, verifyOtp } from "../app/controllers/OTPSend";
 import { paymentRoutes } from "../app/module/payment/payment.route";
 import { Interest } from "../app/module/interest/interest.route";
 import { AuthRoutes } from "../app/module/auth/auth.route";
+import { subscriptionRoutes } from "../app/module/subscription/subscription.route";
 
 
 const router = Router();
@@ -39,6 +40,10 @@ const moduleROuters = [
     path: "/interest",
     route: Interest,
   },
+  {
+    path: "/subscription",
+    route: subscriptionRoutes,
+  }
 ];
 moduleROuters.forEach((route) => router.use(route.path, route.route));
 export default router;

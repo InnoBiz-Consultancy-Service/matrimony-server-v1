@@ -1,8 +1,8 @@
 // ignore.route.ts
 import express from "express";
 import { IgnoreController } from "./ignoreList.controller";
-import { USER_ROLE } from "../types/global";
-import checkAuth from "../../middlewares/checkAuth";
+import checkAuth from "../../../middlewares/checkAuth";
+import { USER_ROLE } from "../../../types/global";
 
 const router = express.Router();
 

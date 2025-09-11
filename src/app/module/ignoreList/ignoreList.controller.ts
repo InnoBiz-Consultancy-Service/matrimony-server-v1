@@ -1,8 +1,8 @@
 // ignore.controller.ts
 import { Request, Response } from "express";
 
-import { sendResponse } from "../../utils/sendResponse";
 import { IgnoreService } from "./ignoreList.service";
+import { sendResponse } from "../../../utils/sendResponse";
 
 const ignoreUser = async (req: Request, res: Response) => {
   try {
