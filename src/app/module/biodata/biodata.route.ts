@@ -13,9 +13,10 @@ router.post("/", checkAuth(USER_ROLE.USER), BiodataControllers.createOrUpdateBio
 router.patch("/", checkAuth(USER_ROLE.USER), BiodataControllers.updateOwnBiodata);
 router.get("/all", checkAuth(USER_ROLE.ADMIN), BiodataControllers.getAllBiodata);
 router.get("/my-biodata", checkAuth(USER_ROLE.USER), BiodataControllers.getOwnBiodata);
-router.get("/:id", checkAuth(USER_ROLE.ADMIN), BiodataControllers.getBiodataById);
-router.patch("/:id/approval", checkAuth(USER_ROLE.ADMIN), BiodataControllers.approveOrRejectBiodata);
 router.get("/pending", checkAuth(USER_ROLE.ADMIN), BiodataControllers.getPendingBiodata);
+router.get("/:id", checkAuth(USER_ROLE.ADMIN,USER_ROLE.USER), BiodataControllers.getBiodataById);
+router.patch("/approval/:id", checkAuth(USER_ROLE.ADMIN), BiodataControllers.approveOrRejectBiodata);
+
 
 
 export const BiodataRoutes = router;

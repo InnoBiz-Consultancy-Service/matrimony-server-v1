@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import User from "../user/user.model";
 import { createUserTokens } from "../../../utils/userToken";
-import { Ignore } from "../../ignoreList/ignoreList.model";
+import { Ignore } from "../ignoreList/ignoreList.model";
 const createOrUpdateBiodata = async (data: IBiodata, userId: string) => {
   const user = await User.findById(userId);
   if (!user) {
@@ -166,22 +166,32 @@ const getAllBiodata = async (filters: any, currentUserId: string) => {
 };
 
 
-const getBiodataById = async (targetUserId: string, currentUserId: string) => {
 
-  const isIgnored = await Ignore.findOne({
-    user: currentUserId,
-    ignoredUser: targetUserId,
-  });
 
-  if (isIgnored) {
-    return null;
+const getBiodataById = async (biodataId: string, currentUserId: string) => {
+  if (!mongoose.Types.ObjectId.isValid(biodataId)) {
+    throw new Error("Invalid biodata ID");
   }
 
-  return await Biodata.findOne({ userId: targetUserId }).populate(
+ 
+  const biodata = await Biodata.findById(biodataId).populate(
     "userId",
     "username email role phone"
   );
+
+  if (!biodata) return null;
+
+  // Ignore check
+  const isIgnored = await Ignore.findOne({
+    user: new mongoose.Types.ObjectId(currentUserId),
+    ignoredUser: biodata.userId._id,
+  });
+
+  if (isIgnored) return null;
+
+  return biodata;
 };
+
 
 
 const approveOrRejectBiodata = async (id: string, status: ApprovalStatus) => {

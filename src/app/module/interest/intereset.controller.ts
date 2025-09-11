@@ -15,7 +15,7 @@ const sendInterest = async (req: Request, res: Response) => {
       });
     }
 
-    const { receiverId } = req.body;
+    const  receiverId  = req.query.receiverId as string;
     if (!receiverId) {
       return sendResponse(res, {
         statusCode: 400,

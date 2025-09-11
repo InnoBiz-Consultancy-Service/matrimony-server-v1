@@ -16,15 +16,17 @@ export interface AuthUser {
 // Middleware
 const checkAuth = (...requiredRoles: string[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(" ")[1]; // "Bearer <token>"
+    const token = req.headers.authorization;
+// console.log("Authorization Header:", req.headers.authorization);
 
+// console.log("Token:", token);
     if (!token) {
       throw new AppError(401, "You are not authorized.");
     }
 
     let decoded: JwtPayload;
     try {
-      decoded = jwt.verify(token, envVars.JWT_ACCESS_SECRET as string) as JwtPayload;
+    decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultsecret") as JwtPayload;
     } catch (err) {
       throw new AppError(401, "Invalid or expired token.");
     }
@@ -39,12 +41,12 @@ const checkAuth = (...requiredRoles: string[]) => {
     }
 
     // Assign typed user to request
-    req.user = {
-      userId: decoded.userId as string,
-      email: decoded.userEmail as string,
-      username: decoded.username as string,
-      role: decoded.role as string,
-    } as AuthUser;
+ req.user = {
+  userId: decoded.userId as string,
+  email: (decoded as any).userEmail as string,
+  username: (decoded as any).name as string,
+  role: decoded.role as string,
+} as AuthUser;
 
     next();
   });

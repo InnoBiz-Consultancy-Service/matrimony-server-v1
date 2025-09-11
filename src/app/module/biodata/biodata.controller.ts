@@ -66,12 +66,11 @@ const getOwnBiodata = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// Get biodata by id (admin)
 const getBiodataById = catchAsync(async (req: Request, res: Response) => {
-  const targetUserId = req.params.id;
+  const biodataId = req.params.id; 
   const currentUserId = req.user?.userId;
 
-  const result = await BiodataServices.getBiodataById(targetUserId, currentUserId!);
+  const result = await BiodataServices.getBiodataById(biodataId, currentUserId!);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -84,8 +83,8 @@ const getBiodataById = catchAsync(async (req: Request, res: Response) => {
 // Approve or reject biodata (admin)
 const approveOrRejectBiodata = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const { status } = req.body;
-
+  let { status } = req.body;
+  status = status.toUpperCase();
   if (!Object.values(ApprovalStatus).includes(status)) {
     return sendResponse(res, {
       statusCode: httpStatus.BAD_REQUEST,
