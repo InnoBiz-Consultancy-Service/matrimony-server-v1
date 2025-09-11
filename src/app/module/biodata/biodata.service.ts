@@ -44,8 +44,7 @@ const updateOwnBiodata = async (
 const getAllBiodata = async (filters: any, currentUserId: string) => {
   const conditions: any[] = [];
 
-  // ✅ Default condition: only approved biodata
-  conditions.push({ approvalStatus: "approved" });
+ conditions.push({ isApproved: ApprovalStatus.APPROVED });
 
    const ignored = await Ignore.find({ user: currentUserId }).select("ignoredUser");
   const ignoredIds = ignored.map((i) => i.ignoredUser);
