@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import User from "../user/user.model";
 import { createUserTokens } from "../../../utils/userToken";
+import { Ignore } from "../../ignoreList/ignoreList.model";
 const createOrUpdateBiodata = async (data: IBiodata, userId: string) => {
   const user = await User.findById(userId);
   if (!user) {
@@ -40,12 +41,17 @@ const updateOwnBiodata = async (
   return await Biodata.findOneAndUpdate({ userId }, updateData, { new: true });
 };
 
-const getAllBiodata = async (filters: any) => {
+const getAllBiodata = async (filters: any, currentUserId: string) => {
   const conditions: any[] = [];
 
   // ✅ Default condition: only approved biodata
   conditions.push({ approvalStatus: "approved" });
 
+   const ignored = await Ignore.find({ user: currentUserId }).select("ignoredUser");
+  const ignoredIds = ignored.map((i) => i.ignoredUser);
+  if (ignoredIds.length > 0) {
+    conditions.push({ userId: { $nin: ignoredIds } });
+  }
   // Name filter
   if (filters.name && filters.name.trim() !== "") {
     conditions.push({ name: { $regex: filters.name, $options: "i" } });
