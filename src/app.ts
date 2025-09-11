@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import router from "./routers";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
+import { notFoundHandler } from "./utils/notFound";
 
 
 console.log("App starting...");
@@ -24,9 +25,10 @@ app.use(
 app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send({ message: "Alhamdulilah Server is running...." });
+  res.send({ message: "Matrimony Server is running...." });
 });
 
 app.use(globalErrorHandler);
+app.use(notFoundHandler);
 
 export default app;

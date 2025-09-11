@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { SubscriptionServices } from "./subscription.service";
 import mongoose from "mongoose";
+import { SubscriptionServices } from "./subscription.service";
+import { sendResponse } from "../../../utils/sendResponse";
 const createSubscription = async (req: Request, res: Response) => {
   try {
     const { type, durationInMonths, profileViewLimit } = req.body;
@@ -14,30 +15,60 @@ const createSubscription = async (req: Request, res: Response) => {
       status: "inactive",
     });
 
-    res.status(201).json({ message: "Subscription created", data: subscription });
+    sendResponse(res, {
+      statusCode: 201,
+      success: true,
+      message: "Subscription created successfully",
+      data: subscription,
+    });
   } catch (error: any) {
-    res.status(400).json({ message: error.message || "Failed to create subscription" });
+    sendResponse(res, {
+      statusCode: 400,
+      success: false,
+      message: error.message || "Failed to create subscription",
+      data: null,
+    });
   }
 };
-
 
 const activateSubscription = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const subscription = await SubscriptionServices.activateSubscription(id);
 
-    res.status(200).json({ message: "Subscription activated", data: subscription });
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Subscription activated successfully",
+      data: subscription,
+    });
   } catch (error: any) {
-    res.status(400).json({ message: error.message || "Failed to activate subscription" });
+    sendResponse(res, {
+      statusCode: 400,
+      success: false,
+      message: error.message || "Failed to activate subscription",
+      data: null,
+    });
   }
 };
 
 const getAllSubscriptions = async (req: Request, res: Response) => {
   try {
     const subscriptions = await SubscriptionServices.getAllSubscriptions();
-    res.status(200).json({ message: "All subscriptions fetched", data: subscriptions });
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "All subscriptions fetched successfully",
+      data: subscriptions,
+    });
   } catch (error: any) {
-    res.status(400).json({ message: error.message || "Failed to fetch subscriptions" });
+    sendResponse(res, {
+      statusCode: 400,
+      success: false,
+      message: error.message || "Failed to fetch subscriptions",
+      data: [],
+    });
   }
 };
 
@@ -45,12 +76,29 @@ const getSubscriptionById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const subscription = await SubscriptionServices.getSubscriptionById(id);
+
     if (!subscription) {
-      return res.status(404).json({ message: "Subscription not found" });
+      return sendResponse(res, {
+        statusCode: 404,
+        success: false,
+        message: "Subscription not found",
+        data: null,
+      });
     }
-    res.status(200).json({ message: "Subscription fetched", data: subscription });
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Subscription fetched successfully",
+      data: subscription,
+    });
   } catch (error: any) {
-    res.status(400).json({ message: error.message || "Failed to fetch subscription" });
+    sendResponse(res, {
+      statusCode: 400,
+      success: false,
+      message: error.message || "Failed to fetch subscription",
+      data: null,
+    });
   }
 };
 

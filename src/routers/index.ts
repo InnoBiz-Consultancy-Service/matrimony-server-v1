@@ -4,14 +4,19 @@ import { BiodataRoutes } from "../app/module/biodata/biodata.route";
 import { sendOtp, verifyOtp } from "../app/controllers/OTPSend";
 import { paymentRoutes } from "../app/module/payment/payment.route";
 import { Interest } from "../app/module/interest/interest.route";
+import { AuthRoutes } from "../app/module/auth/auth.route";
 
 
 const router = Router();
 
 const moduleROuters = [
   {
-    path: "/auth",
+    path: "/user",
     route: UserRoutes,
+  },
+  {
+    path: "/auth",
+    route: AuthRoutes,
   },
   {
     path: "/biodata",
