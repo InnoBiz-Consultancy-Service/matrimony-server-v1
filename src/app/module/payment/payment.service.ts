@@ -3,11 +3,13 @@ import Subscription from "../subscription/subscription.model";
 import User from "../user/user.model";
 import { IPayment } from "./payment.interface";
 
-const createPayment = async (data: IPayment) => {
-  const payment = new Payment(data);
+const createPayment = async (data: IPayment, userId: string) => {
+  const payment = new Payment({
+    ...data,
+    userId,
+  });
   return await payment.save();
 };
-
 const approvePayment = async (paymentId: string) => {
   const payment = await Payment.findById(paymentId);
   if (!payment) throw new Error("Payment not found");

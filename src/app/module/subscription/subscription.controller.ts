@@ -104,7 +104,7 @@ const getSubscriptionById = async (req: Request, res: Response) => {
   }
 };
 const expireSubscription = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id  = req.params.id;
   const subscription = await SubscriptionServices.expireSubscription(id);
 
   sendResponse(res, {

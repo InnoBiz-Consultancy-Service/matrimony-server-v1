@@ -7,7 +7,7 @@ import catchAsync from "../../../utils/catchAsync";
 
 const router = express.Router();
 
-router.post("/create", auth(USER_ROLE.ADMIN), SubscriptionControllers.createSubscription);
+router.post("/create", auth(USER_ROLE.USER), SubscriptionControllers.createSubscription);
 
 
 
@@ -20,6 +20,6 @@ router.get("/:id", auth(USER_ROLE.ADMIN), catchAsync(SubscriptionControllers.get
 // activate subscription after payment success (admin or payment callback)
 router.patch("/activate/:id", auth(USER_ROLE.ADMIN), SubscriptionControllers.activateSubscription);
 
-router.patch("expire/:id", auth(USER_ROLE.ADMIN), SubscriptionControllers.expireSubscription);
+router.patch("/expire/:id", auth(USER_ROLE.ADMIN), SubscriptionControllers.expireSubscription);
 
 export const subscriptionRoutes =  router;

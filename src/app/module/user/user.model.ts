@@ -13,6 +13,7 @@ const userSchema = new Schema<IUser>(
     agreeToPrivacy: { type: Boolean, required: true },
     agreeToTerms: { type: Boolean, required: true },
     isVerified: { type: Boolean, required: true, default: false },
+ 
   },
   { timestamps: true }
 );

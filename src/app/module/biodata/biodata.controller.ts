@@ -84,7 +84,7 @@ const getBiodataById = catchAsync(async (req: Request, res: Response) => {
 const approveOrRejectBiodata = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   let { status } = req.body;
-  status = status.toUpperCase();
+  status = status.toLowerCase();
   if (!Object.values(ApprovalStatus).includes(status)) {
     return sendResponse(res, {
       statusCode: httpStatus.BAD_REQUEST,

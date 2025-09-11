@@ -6,7 +6,9 @@ import { sendResponse } from "../../../utils/sendResponse";
 
 export const createPayment = async (req: Request, res: Response) => {
   try {
-    const result = await PaymentServices.createPayment(req.body);
+    const userId = req.user?.userId as string;
+    const data = req.body;
+    const result = await PaymentServices.createPayment(data, userId);
     sendResponse(res, {
       statusCode: 201,
       success: true,

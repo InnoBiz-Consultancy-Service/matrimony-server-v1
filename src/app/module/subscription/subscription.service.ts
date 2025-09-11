@@ -48,10 +48,22 @@ const activateSubscription = async (id: string) => {
 
   return sub;
 };
-
 const expireSubscription = async (id: string) => {
-  return await Subscription.findByIdAndUpdate(id, { status: "expired" }, { new: true });
+
+  const sub = await Subscription.findByIdAndUpdate(
+    id,
+    { status: "expired" },
+    { new: true }
+  );
+
+  if (!sub) throw new Error("Subscription not found");
+
+  
+
+
+  return sub;
 };
+
 
 const getUserSubscription = async (userId: string) => {
   return await Subscription.findOne({ userId, status: "active" });
