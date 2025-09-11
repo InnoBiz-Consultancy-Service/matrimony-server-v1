@@ -167,12 +167,23 @@ const getAllBiodata = async (filters: any, currentUserId: string) => {
 };
 
 
-const getBiodataById = async (userId: string) => {
-  return await Biodata.findOne({ userId }).populate(
+const getBiodataById = async (targetUserId: string, currentUserId: string) => {
+
+  const isIgnored = await Ignore.findOne({
+    user: currentUserId,
+    ignoredUser: targetUserId,
+  });
+
+  if (isIgnored) {
+    return null;
+  }
+
+  return await Biodata.findOne({ userId: targetUserId }).populate(
     "userId",
     "username email role phone"
   );
 };
+
 
 const approveOrRejectBiodata = async (id: string, status: ApprovalStatus) => {
   if (![ApprovalStatus.APPROVED, ApprovalStatus.REJECTED].includes(status)) {
