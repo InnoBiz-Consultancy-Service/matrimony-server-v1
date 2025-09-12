@@ -7,12 +7,21 @@ const ignoreUser = async (userId: string, ignoredUserId: string) => {
     throw new Error("You cannot ignore yourself");
   }
 
-  return await Ignore.findOneAndUpdate(
-    { user: userId, ignoredUser: ignoredUserId },
-    { user: userId, ignoredUser: ignoredUserId },
-    { upsert: true, new: true }
-  );
+
+  const existing = await Ignore.findOne({ user: userId, ignoredUser: ignoredUserId });
+  if (existing) {
+    throw new Error("You have already ignored this user");
+  }
+
+ 
+  const newIgnore = await Ignore.create({
+    user: userId,
+    ignoredUser: ignoredUserId,
+  });
+
+  return newIgnore;
 };
+
 
 const unignoreUser = async (userId: string, ignoredUserId: string) => {
   return await Ignore.findOneAndDelete({ user: userId, ignoredUser: ignoredUserId });

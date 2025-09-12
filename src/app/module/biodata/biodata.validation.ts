@@ -1,127 +1,116 @@
-// import { z } from "zod";
+import { z } from "zod";
 
-// // Address validation schema
-// const addressSchema = z.object({
-//   address: z.string().default("উত্তর দেয়া হয়নি"),
-//   upazila: z.string().default("উত্তর দেয়া হয়নি"),
-//   district: z.string().default("উত্তর দেয়া হয়নি"),
-//   division: z.string().default("উত্তর দেয়া হয়নি"),
-// });
+// Address Schema
+const addressSchema = z.object({
+  address: z.string().default("উত্তর দেয়া হয়নি"),
+  upazila: z.string().default("উত্তর দেয়া হয়নি"),
+  district: z.string().default("উত্তর দেয়া হয়নি"),
+  division: z.string().default("উত্তর দেয়া হয়নি"),
+});
 
-// // Education history item schema
-// const educationHistorySchema = z.object({
-//   level: z.string().optional(),
-//   year: z.number().optional(),
-//   group: z.string().optional(),
-//   result: z.string().optional(),
-//   subject: z.string().optional(),
-//   institution: z.string().optional(),
-// });
+// Education Schema
+const educationHistorySchema = z.object({
+  level: z.string(),
+  year: z.number(),
+  group: z.string().default("General"),
+  result: z.string().default("উত্তর দেয়া হয়নি"),
+  subject: z.string().default("উত্তর দেয়া হয়নি"),
+  institution: z.string().default("উত্তর দেয়া হয়নি"),
+});
 
-// // Income schema
-// const incomeSchema = z.object({
-//   amount: z.number().default(0),
-//   currency: z.string().default("BDT"),
-// });
+const educationSchema = z.object({
+  method: z.string().default("General"),
+  history: z.array(educationHistorySchema).default([]),
+  other: z.array(z.string()).default([]),
+});
 
-// // Main biodata validation schema
-// export const biodataSchema = z.object({
-//   userId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid ObjectId format"),
-//   name: z.string().min(1, "Name is required"),
-//   gender: z.enum(["Male", "Female", "Other"]),
-//   age: z
-//     .number()
-//     .min(1, "Age must be at least 1")
-//     .max(120, "Age must be less than 120"),
+// Family Schema
+const familySchema = z.object({
+  fatherAlive: z.boolean().default(true),
+  motherAlive: z.boolean().default(true),
+  fatherProfession: z.string().default("উত্তর দেয়া হয়নি"),
+  motherProfession: z.string().default("উত্তর দেয়া হয়নি"),
+  brothers: z.number().default(0),
+  sisters: z.number().default(0),
+  sistersInfo: z.array(z.string()).default([]),
+  unclesProfession: z.array(z.string()).default([]),
+  financialStatus: z.string().default("উত্তর দেয়া হয়নি"),
+  financialDetails: z.string().default("উত্তর দেয়া হয়নি"),
+  religiousPractice: z.string().default("উত্তর দেয়া হয়নি"),
+});
 
-//   address: z
-//     .object({
-//       present: addressSchema,
-//       permanent: addressSchema,
-//       grewUpAt: z.string().default("উত্তর দেয়া হয়নি"),
-//     })
-//     .optional(),
+// Personal Schema
+const personalSchema = z.object({
+  dress: z.string().default("উত্তর দেয়া হয়নি"),
+  prayerHabit: z.string().default("উত্তর দেয়া হয়নি"),
+  maintainMahram: z.boolean().default(false),
+  quranReading: z.boolean().default(false),
+  fiqh: z.string().default("উত্তর দেয়া হয়নি"),
+  entertainment: z.boolean().default(false),
+  healthIssues: z.boolean().default(false),
+  specialSkills: z.string().default("উত্তর দেয়া হয়নি"),
+  favoriteBooks: z.array(z.string()).default([]),
+  hobbies: z.array(z.string()).default([]),
+});
 
-//   education: z
-//     .object({
-//       method: z.string().default("General"),
-//       history: z.array(educationHistorySchema).default([]),
-//       other: z.array(z.string()).default([]),
-//     })
-//     .optional(),
+// Occupation Schema
+const occupationSchema = z.object({
+  current: z.string().default("উত্তর দেয়া হয়নি"),
+  description: z.string().default("উত্তর দেয়া হয়নি"),
+  income: z.object({
+    amount: z.number().default(0),
+    currency: z.string().default("BDT"),
+  }).default({}),
+});
 
-//   family: z
-//     .object({
-//       fatherAlive: z.boolean().default(true),
-//       motherAlive: z.boolean().default(true),
-//       fatherProfession: z.string().default("উত্তর দেয়া হয়নি"),
-//       motherProfession: z.string().default("উত্তর দেয়া হয়নি"),
-//       brothers: z.number().min(0).default(0),
-//       sisters: z.number().min(0).default(0),
-//       sistersInfo: z.array(z.string()).default([]),
-//       unclesProfession: z.array(z.string()).default([]),
-//       financialStatus: z.string().default("উত্তর দেয়া হয়নি"),
-//       financialDetails: z.string().default("উত্তর দেয়া হয়নি"),
-//       religiousPractice: z.string().default("উত্তর দেয়া হয়নি"),
-//     })
-//     .optional(),
+// Marriage Schema
+const marriageSchema = z.object({
+  guardiansAgree: z.boolean().default(false),
+  studyContinue: z.boolean().nullable().default(null),
+  reason: z.string().default("উত্তর দেয়া হয়নি"),
+  jobStatus: z.string().default("উত্তর দেয়া হয়নি"),
+});
 
-//   personal: z
-//     .object({
-//       name: z.string().default("উত্তর দেওয়া হয়নি"),
-//       gender: z.string().default("উত্তর দেওয়া হয়নি"),
-//       dress: z.string().default("উত্তর দেয়া হয়নি"),
-//       prayerHabit: z.string().default("উত্তর দেয়া হয়নি"),
-//       maintainMahram: z.boolean().default(false),
-//       quranReading: z.boolean().default(false),
-//       fiqh: z.string().default("উত্তর দেয়া হয়নি"),
-//       entertainment: z.boolean().default(false),
-//       healthIssues: z.boolean().default(false),
-//       specialSkills: z.string().default("উত্তর দেয়া হয়নি"),
-//       favoriteBooks: z.array(z.string()).default([]),
-//       hobbies: z.array(z.string()).default([]),
-//     })
-//     .optional(),
+// Preference Schema
+const preferenceSchema = z.object({
+  ageRange: z.string().default("উত্তর দেয়া হয়নি"),
+  complexion: z.string().default("উত্তর দেয়া হয়নি"),
+  height: z.string().default("উত্তর দেয়া হয়নি"),
+  education: z.string().default("উত্তর দেয়া হয়নি"),
+  location: z.string().default("উত্তর দেয়া হয়নি"),
+  maritalStatus: z.string().default("উত্তর দেয়া হয়নি"),
+  profession: z.string().default("উত্তর দেয়া হয়নি"),
+  financialCondition: z.string().default("উত্তর দেয়া হয়নি"),
+  qualities: z.array(z.string()).default([]),
+});
 
-//   occupation: z
-//     .object({
-//       current: z.string().default("উত্তর দেয়া হয়নি"),
-//       description: z.string().default("উত্তর দেয়া হয়নি"),
-//       income: incomeSchema,
-//     })
-//     .optional(),
+// Pledge Schema
+const pledgeSchema = z.object({
+  parentsAware: z.boolean().default(false),
+  informationAccurate: z.boolean().default(false),
+  nikahResponsibility: z.boolean().default(false),
+});
 
-//   marriage: z
-//     .object({
-//       guardiansAgree: z.boolean().default(false),
-//       studyContinue: z.boolean().nullable().default(null),
-//       reason: z.string().default("উত্তর দেয়া হয়নি"),
-//       jobStatus: z.string().default("উত্তর দেয়া হয়নি"),
-//     })
-//     .optional(),
+// Full Biodata Schema
+export const biodataSchema = z.object({
+  userId: z.string().optional(), 
+  name: z.string(),
+  gender: z.enum(["male", "female"]),
+  age: z.number(),
 
-//   preference: z
-//     .object({
-//       ageRange: z.string().default("উত্তর দেয়া হয়নি"),
-//       complexion: z.string().default("উত্তর দেয়া হয়নি"),
-//       height: z.string().default("উত্তর দেয়া হয়নি"),
-//       education: z.string().default("উত্তর দেয়া হয়নি"),
-//       location: z.string().default("উত্তর দেয়া হয়নি"),
-//       maritalStatus: z.string().default("উত্তর দেয়া হয়নি"),
-//       profession: z.string().default("উত্তর দেয়া হয়নি"),
-//       financialCondition: z.string().default("উত্তর দেয়া হয়নি"),
-//       qualities: z.array(z.string()).default([]),
-//     })
-//     .optional(),
+  address: z.object({
+    present: addressSchema,
+    permanent: addressSchema,
+    grewUpAt: z.string().default("উত্তর দেয়া হয়নি"),
+    country: z.string().default("Bangladesh"),
+  }),
 
-//   pledge: z
-//     .object({
-//       parentsAware: z.boolean().default(false),
-//       informationAccurate: z.boolean().default(false),
-//       nikahResponsibility: z.boolean().default(false),
-//     })
-//     .optional(),
-
-//   query: z.object({}).optional(),
-//   params: z.object({}).optional(),
-// });
+  education: educationSchema,
+  family: familySchema,
+  personal: personalSchema,
+  occupation: occupationSchema,
+  marriage: marriageSchema,
+  preference: preferenceSchema,
+  pledge: pledgeSchema,
+  isApproved: z.enum(["pending", "approved", "rejected"]).default("pending"),
+});
