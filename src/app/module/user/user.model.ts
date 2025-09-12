@@ -13,7 +13,9 @@ const userSchema = new Schema<IUser>(
     agreeToPrivacy: { type: Boolean, required: true },
     agreeToTerms: { type: Boolean, required: true },
     isVerified: { type: Boolean, required: true, default: false },
- 
+    subscriptionType: { type: String, enum: ["free", "premium", "vip"], default: "free" },
+   subscriptionId: { type: Schema.Types.ObjectId, ref: "Subscription" }, 
+
   },
   { timestamps: true }
 );

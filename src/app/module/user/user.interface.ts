@@ -15,7 +15,8 @@ export interface IUser {
   agreeToTerms: boolean;
   isVerified?: boolean;
   hasBiodata?: boolean;
-
+  subscriptionType?: "free" | "premium" | "vip";
+  subscriptionId?: Types.ObjectId;
   createdAt?: Date;
   updatedAt?: Date;
 }

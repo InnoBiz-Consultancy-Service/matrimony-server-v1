@@ -1,6 +1,6 @@
 import { z } from "zod";
 export const userRegisterSchema = z.object({
-  body: z.object({
+
     name: z.string(),
     password: z
       .string()
@@ -10,7 +10,7 @@ export const userRegisterSchema = z.object({
     email: z.string().email(),
     phone: z.string(),
     gender: z.enum(["male", "female"]),
-  }),
+
 });
 
 

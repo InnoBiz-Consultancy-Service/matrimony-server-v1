@@ -10,7 +10,7 @@ const createSubscription = async (req: Request, res: Response) => {
 
     const subscription = await SubscriptionServices.createSubscription({
       userId,
-      type,
+      subscriptionType: type,
       durationInMonths,
       profileViewLimit,
       status: "inactive",

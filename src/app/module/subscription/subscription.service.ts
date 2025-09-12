@@ -1,6 +1,7 @@
 import Subscription from "./subscription.model";
 import { ISubscription } from "./subscription.interface";
 import User from "../user/user.model"; // user model path adjust করো তোমার structure অনুযায়ী
+
 const createSubscription = async (data: Partial<ISubscription>): Promise<ISubscription> => {
   const subscription = new Subscription({
     ...data,
@@ -8,7 +9,6 @@ const createSubscription = async (data: Partial<ISubscription>): Promise<ISubscr
   });
   return await subscription.save();
 };
-
 
 const activateSubscription = async (id: string) => {
   const sub = await Subscription.findById(id);
@@ -24,8 +24,8 @@ const activateSubscription = async (id: string) => {
 
   // determine default limit if not already set
   if (!sub.profileViewLimit || sub.profileViewLimit === 0) {
-    if (sub.type === "premium") sub.profileViewLimit = 20;
-    else if (sub.type === "vip") sub.profileViewLimit = 100;
+    if (sub.subscriptionType === "premium") sub.profileViewLimit = 20;
+    else if (sub.subscriptionType === "vip") sub.profileViewLimit = 100;
     else sub.profileViewLimit = 5;
   }
 
@@ -33,14 +33,14 @@ const activateSubscription = async (id: string) => {
 
   // update user accordingly
   const updateFields: any = {
-    subscriptionType: sub.type,
+    subscriptionType: sub.subscriptionType,
     subscriptionStatus: sub.status,
     profileViewLimit: sub.profileViewLimit,
   };
 
-  if (sub.type === "premium") {
+  if (sub.subscriptionType === "premium") {
     updateFields.subscriberPremium = true;
-  } else if (sub.type === "vip") {
+  } else if (sub.subscriptionType === "vip") {
     updateFields.subscriberVIP = true;
   }
 
@@ -48,8 +48,8 @@ const activateSubscription = async (id: string) => {
 
   return sub;
 };
-const expireSubscription = async (id: string) => {
 
+const expireSubscription = async (id: string) => {
   const sub = await Subscription.findByIdAndUpdate(
     id,
     { status: "expired" },
@@ -58,12 +58,8 @@ const expireSubscription = async (id: string) => {
 
   if (!sub) throw new Error("Subscription not found");
 
-  
-
-
   return sub;
 };
-
 
 const getUserSubscription = async (userId: string) => {
   return await Subscription.findOne({ userId, status: "active" });

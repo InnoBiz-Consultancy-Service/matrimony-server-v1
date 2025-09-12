@@ -7,6 +7,7 @@ import { Interest } from "../app/module/interest/interest.route";
 import { AuthRoutes } from "../app/module/auth/auth.route";
 import { subscriptionRoutes } from "../app/module/subscription/subscription.route";
 import { IgnoreRoutes } from "../app/module/ignoreList/ignoreList.route";
+import profileVisitRoutes from "../app/module/profileVisitCount/profileVisit.route";
 
 
 const router = Router();
@@ -48,6 +49,10 @@ const moduleROuters = [
   {
     path: "/ignore",
     route: IgnoreRoutes,
+  },
+  {
+    path: "/profile-visit",
+    route: profileVisitRoutes,
   }
 ];
 moduleROuters.forEach((route) => router.use(route.path, route.route));

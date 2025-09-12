@@ -3,6 +3,7 @@ import { UserServices } from "./user.service";
 import { sendResponse } from "../../../utils/sendResponse";
 
 import Payment from "../payment/payment.model";
+import catchAsync from "../../../utils/catchAsync";
 
 // Registration
 export const registerUser = async (req: Request, res: Response) => {
@@ -46,9 +47,18 @@ const verifyUser = async (req: Request, res: Response) => {
     data: updatedUser,
   });
 };
-
+const getAllUsers = catchAsync(async(req:Request,res:Response)=>{
+  const users = await UserServices.getAllUsers();
+  sendResponse(res,{
+    statusCode:200,
+    success:true,
+    message:"Users fetched successfully",
+    data:users
+  });
+});
 export const UserControllers = {
   registerUser,
  
   verifyUser,
+  getAllUsers
 };
