@@ -38,9 +38,12 @@ const verifyUser = async (id: string) => {
 
   return updatedUser;
 };
-
+const getAllUsers = async()=>{
+  return await User.find();
+}
 export const UserServices = {
   registerUserIntoDB,
   loginUserFromDB,
   verifyUser,
+  getAllUsers
 };

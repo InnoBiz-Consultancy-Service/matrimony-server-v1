@@ -12,42 +12,38 @@ const createPayment = async (data: IPayment, userId: string) => {
 };
 const approvePayment = async (paymentId: string) => {
   const payment = await Payment.findById(paymentId);
-  if (!payment) throw new Error("Payment not found");
+  if(!payment) throw new Error("Payment not found");
 
-  // Update payment status
   payment.approvalStatus = "approved";
   await payment.save();
 
   const durationInMonths = payment.durationInMonths || 1;
 
-  // Create subscription
+  // Subscription
+  const profileViewLimit = payment.subscriptionType === "vip" ? 300 : 100;
   const subscription = await Subscription.create({
     userId: payment.userId,
-    type: payment.subscriptionType,
+    subscriptionType: payment.subscriptionType,
     durationInMonths,
-    status: "active",
     startDate: new Date(),
-    endDate: new Date(new Date().setMonth(new Date().getMonth() + Number(durationInMonths))),
-    profileViewLimit: payment.subscriptionType === "vip" ? 100 : 20,
+    endDate: new Date(new Date().setMonth(new Date().getMonth() + durationInMonths)),
+    status: "active",
+    profileViewLimit
   });
 
-  // Update user info
+  // Update user
   const userUpdate: any = {
-    subscriptionStatus: "active",
     subscriptionType: payment.subscriptionType,
-    profileViewLimit: subscription.profileViewLimit,
+    subscriptionId: subscription._id,
+  
   };
 
-  if (payment.subscriptionType === "vip") {
-    userUpdate.subscriberVIP = true;
-  } else {
-    userUpdate.subscriberPremium = true;
-  }
 
   await User.findByIdAndUpdate(payment.userId, userUpdate);
 
   return subscription;
 };
+
 
 const getAllPayments = async () => {
   return await Payment.find().populate("userId", "username email role");
