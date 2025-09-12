@@ -6,25 +6,28 @@ import User from "../user/user.model";
 import { createUserTokens } from "../../../utils/userToken";
 import { Ignore } from "../ignoreList/ignoreList.model";
 const createOrUpdateBiodata = async (data: IBiodata, userId: string) => {
+
   const user = await User.findById(userId);
   if (!user) {
     throw new Error("User does not exist. Cannot create biodata.");
   }
 
-  // 2. Create or update biodata
+
   let biodata = await Biodata.findOne({ userId });
   if (biodata) {
-   biodata = await Biodata.findOneAndUpdate(
+ 
+    biodata = await Biodata.findOneAndUpdate(
       { userId },
       { ...data, isApproved: ApprovalStatus.PENDING }, 
       { new: true }
     );
   } else {
+
     const newBiodata = new Biodata({ ...data, userId });
     biodata = await newBiodata.save();
   }
 
-
+  // 3. Generate access token
   const { accessToken } = createUserTokens({
     ...user.toObject(),
     hasBiodata: true,
@@ -32,6 +35,7 @@ const createOrUpdateBiodata = async (data: IBiodata, userId: string) => {
 
   return { biodata, accessToken };
 };
+
 
 
 const updateOwnBiodata = async (

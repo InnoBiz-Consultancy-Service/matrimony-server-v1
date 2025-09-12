@@ -7,7 +7,7 @@ import { sendResponse } from "../../../utils/sendResponse";
 const ignoreUser = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.userId as string;
-    const { ignoredUserId } = req.body;
+    const ignoredUserId = req.query.ignoredUserId as string;
 
     const result = await IgnoreService.ignoreUser(userId, ignoredUserId);
 
@@ -30,7 +30,7 @@ const ignoreUser = async (req: Request, res: Response) => {
 const unignoreUser = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.userId as string;
-    const { ignoredUserId } = req.body;
+    const ignoredUserId = req.query.ignoredUserId as string;
 
     const result = await IgnoreService.unignoreUser(userId, ignoredUserId);
 

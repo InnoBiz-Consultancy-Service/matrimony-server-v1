@@ -6,8 +6,9 @@ import { USER_ROLE } from "../../../types/global";
 
 const router = express.Router();
 
-router.post("/ignore", checkAuth(USER_ROLE.USER), IgnoreController.ignoreUser);
-router.post("/unignore", checkAuth(USER_ROLE.USER), IgnoreController.unignoreUser);
-router.get("/ignored", checkAuth(USER_ROLE.USER), IgnoreController.getIgnoredUsers);
+router.post("/", checkAuth(USER_ROLE.USER), IgnoreController.ignoreUser);
+router.get("/", checkAuth(USER_ROLE.USER), IgnoreController.getIgnoredUsers);
+router.delete("/unignore", checkAuth(USER_ROLE.USER), IgnoreController.unignoreUser);
+
 
 export const IgnoreRoutes = router;

@@ -18,7 +18,7 @@ const cancelInterest = async (senderId: string, receiverId: string): Promise<IIn
 };
 
 const getSentInterests = async (userId: string) => {
-  return await Interest.find({ sender: userId, status: "sent" }).populate("receiver", "name email");
+  return await Interest.find({ sender: userId, status: "sent" }).populate("receiver");
 };
 
 const getReceivedInterests = async (userId: string) => {
