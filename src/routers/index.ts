@@ -8,6 +8,8 @@ import { AuthRoutes } from "../app/module/auth/auth.route";
 import { subscriptionRoutes } from "../app/module/subscription/subscription.route";
 import { IgnoreRoutes } from "../app/module/ignoreList/ignoreList.route";
 import profileVisitRoutes from "../app/module/profileVisitCount/profileVisit.route";
+import { MailRoutes } from "../app/sendMail/sendMail.route";
+import { ReviewRoutes } from "../app/review/review.route";
 
 
 const router = Router();
@@ -53,6 +55,14 @@ const moduleROuters = [
   {
     path: "/profile-visit",
     route: profileVisitRoutes,
+  },
+  {
+    path: "/mail",
+    route: MailRoutes,
+  },
+  {
+    path: "/review",
+    route: ReviewRoutes,
   }
 ];
 moduleROuters.forEach((route) => router.use(route.path, route.route));
