@@ -1,8 +1,8 @@
 // src/app/modules/mail/mail.routes.ts
 import express from "express";
 import { MailController } from "./sendMail.controller";
-import checkAuth from "../../middlewares/checkAuth";
-import { USER_ROLE } from "../../types/global";
+import checkAuth from "../../../middlewares/checkAuth";
+import { USER_ROLE } from "../../../types/global";
 
 const router = express.Router();
 

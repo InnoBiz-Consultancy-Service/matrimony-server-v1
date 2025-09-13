@@ -1,5 +1,5 @@
 import { sendResponse } from "../../../utils/sendResponse";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { setAuthCookie } from "../../../utils/setCookie";
 import { UserServices } from "../user/user.service";
 import { BiodataServices } from "../biodata/biodata.service";
@@ -7,6 +7,9 @@ import Payment from "../payment/payment.model";
 import jwt from "jsonwebtoken";
 import catchAsync from "../../../utils/catchAsync";
 import { AuthServices } from "./auth.service";
+
+import { envVars } from "../../../config/envConfig";
+import { IUser } from "../user/user.interface";
 
 
 export const loginUser = async (req: Request, res: Response) => {
@@ -32,7 +35,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const subscriptionType = latestPayment?.subscriptionType || "free";
 
-    // Create JWT token
+
     const accessToken = jwt.sign(
       {
         userId: user._id,
@@ -44,10 +47,10 @@ export const loginUser = async (req: Request, res: Response) => {
         subscriptionType, 
       },
       process.env.JWT_SECRET || "defaultsecret",
-      { expiresIn: "24h" }
+      { expiresIn: "7d" }
     );
 
-    // Set cookie using utility
+
     setAuthCookie(res, { accessToken });
 
     sendResponse(res, {
@@ -98,3 +101,54 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
     data: null,
   });
 });
+
+
+
+export const googleCallbackController = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as IUser | undefined;
+
+    if (!user) {
+      return sendResponse(res, {
+        statusCode: 404,
+        success: false,
+        message: "User not found. Please sign up first.",
+        data: null,
+      });
+    }
+
+
+    const hasBiodata = !!user?.hasBiodata;
+    const subscriptionType = user?.subscriptionType || "free";
+
+    const payload = {
+      userId: user?._id,
+      name: user?.name,
+      userEmail: user?.email,
+      gender: user?.gender,
+      role: user?.role,
+      hasBiodata,
+      subscriptionType,
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET || "defaultsecret", {
+      expiresIn: "7d",
+    });
+
+    // Cookie set
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    // Redirect with optional state
+    let redirectTo = req.query.state as string | undefined;
+    if (redirectTo && redirectTo.startsWith("/")) redirectTo = redirectTo.slice(1);
+
+    res.redirect(`${envVars.FRONTEND_URL}/${redirectTo || ""}`);
+  }
+);
+
+
+
