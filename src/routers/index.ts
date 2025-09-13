@@ -8,8 +8,9 @@ import { AuthRoutes } from "../app/module/auth/auth.route";
 import { subscriptionRoutes } from "../app/module/subscription/subscription.route";
 import { IgnoreRoutes } from "../app/module/ignoreList/ignoreList.route";
 import profileVisitRoutes from "../app/module/profileVisitCount/profileVisit.route";
-import { MailRoutes } from "../app/sendMail/sendMail.route";
-import { ReviewRoutes } from "../app/review/review.route";
+import { MailRoutes } from "../app/module/sendMail/sendMail.route";
+import { ReviewRoutes } from "../app/module/review/review.route";
+import { SpecialOfferRoutes } from "../app/module/specialOffers/specialOffer.route";
 
 
 const router = Router();
@@ -63,6 +64,10 @@ const moduleROuters = [
   {
     path: "/review",
     route: ReviewRoutes,
+  },
+  {
+    path: "/special-offers",
+    route: SpecialOfferRoutes,
   }
 ];
 moduleROuters.forEach((route) => router.use(route.path, route.route));

@@ -1,7 +1,7 @@
 import express from "express";
 import { ReviewController } from "./review.controller";
-import checkAuth from "../../middlewares/checkAuth";
-import { USER_ROLE } from "../../types/global";
+import checkAuth from "../../../middlewares/checkAuth";
+import { USER_ROLE } from "../../../types/global";
 
 const router = express.Router();
 

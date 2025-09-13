@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { ReviewService } from "./review.service";
-import { sendResponse } from "../../utils/sendResponse";
-import catchAsync from "../../utils/catchAsync";
-import AppError from "../../errors/AppError";
-import Biodata from "../module/biodata/biodata.model";
+import { sendResponse } from "../../../utils/sendResponse";
+import catchAsync from "../../../utils/catchAsync";
+import AppError from "../../../errors/AppError";
+import Biodata from "../biodata/biodata.model";
 
 export const ReviewController = {
   createReview: catchAsync(async (req: Request, res: Response) => {

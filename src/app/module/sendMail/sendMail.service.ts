@@ -1,7 +1,7 @@
 // src/app/modules/mail/mail.service.ts
-import { transporter } from "../../config/mailer";
-import AppError from "../../errors/AppError";
-import User from "../module/user/user.model";
+import { transporter } from "../../../config/mailer";
+import AppError from "../../../errors/AppError";
+import User from "../user/user.model";
 import { IMailPayload } from "./sendMail.interface";
 import { Mail } from "./sendMail.model";
 
