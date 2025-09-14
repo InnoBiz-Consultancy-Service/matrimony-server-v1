@@ -6,8 +6,9 @@ import User from "../app/module/user/user.model";
 import AppError from "../errors/AppError";
 
 export const createUserTokens = (user: Partial<IUser>) => {
+
   const jwtPayload = {
-    userId: user._id,
+    userId: user._id ? user._id.toString() : '', 
     email: user.email,
     role: user.role,
   };
@@ -56,7 +57,7 @@ export const createNewAccessTokenWithRefreshToken = async (
   }
 
   const jwtPayload = {
-    userId: isUserExist._id,
+    userId: isUserExist._id ? isUserExist._id.toString() : '', // Convert ObjectId to string
     email: isUserExist.email,
     role: isUserExist.role,
   };
