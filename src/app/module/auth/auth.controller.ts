@@ -9,7 +9,9 @@ import catchAsync from "../../../utils/catchAsync";
 import { AuthServices } from "./auth.service";
 
 import { envVars } from "../../../config/envConfig";
-import { IUser } from "../user/user.interface";
+import { AuthUser } from "../user/user.interface";
+
+
 
 
 export const loginUser = async (req: Request, res: Response) => {
@@ -27,9 +29,9 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const user = await UserServices.loginUserFromDB({ email, password });
 
-    const hasBiodata = !!(await BiodataServices.getOwnBiodata(user._id as string));
+    const hasBiodata = !!(await BiodataServices.getOwnBiodata(user?.userId as string));
 
-    const latestPayment = await Payment.findOne({ userId: user._id })
+    const latestPayment = await Payment.findOne({ userId: user?._id })
       .sort({ paymentDate: -1 }) 
       .lean();
 
@@ -106,7 +108,7 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
 
 export const googleCallbackController = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as IUser | undefined;
+    const user = req.user as AuthUser | undefined;
 
     if (!user) {
       return sendResponse(res, {

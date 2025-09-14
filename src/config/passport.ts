@@ -1,7 +1,16 @@
-import passport, { Profile } from "passport";
-import { Strategy as GoogleStrategy, VerifyCallback } from "passport-google-oauth20";
+import passport from "passport";
+import { Strategy as GoogleStrategy, Profile, VerifyCallback } from "passport-google-oauth20";
 import User from "../app/module/user/user.model";
-import { USER_ROLE } from "../types/global";
+import { BiodataServices } from "../app/module/biodata/biodata.service";
+import Payment from "../app/module/payment/payment.model";
+import { AuthUser } from "../app/module/user/user.interface";
+
+
+
+
+
+
+
 
 passport.use(
   new GoogleStrategy(
@@ -15,13 +24,41 @@ passport.use(
         const email = profile.emails?.[0].value;
         if (!email) return done(null, false, { message: "No email found" });
 
-        const user = await User.findOne({ email });
+        let user = await User.findOne({ email });
         if (!user) {
-          // Auto sign-up disabled
           return done(null, false, { message: "User not found. Please sign up first." });
         }
 
-        return done(null, user);
+        // Get additional user data
+        const hasBiodata = !!(await BiodataServices.getOwnBiodata(user?.userId as string));
+        
+        const latestPayment = await Payment.findOne({ userId: user._id })
+          .sort({ paymentDate: -1 }) 
+          .lean();
+
+        const subscriptionType = latestPayment?.subscriptionType || user.subscriptionType || "free";
+
+   
+        const extendedUser: AuthUser = {
+          userId: user._id.toString(),         
+          email: user.email,
+          _id: user._id,
+          name: user.name,
+      
+          gender: user.gender,
+          role: user.role,
+          hasBiodata,
+          subscriptionType,
+          phone: user.phone,
+          isVerified: user.isVerified,
+          agreeToPrivacy: user.agreeToPrivacy,
+          agreeToTerms: user.agreeToTerms,
+          subscriptionId: user.subscriptionId,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
+        };
+
+        return done(null, extendedUser as any);
       } catch (err) {
         return done(err);
       }
@@ -30,13 +67,44 @@ passport.use(
 );
 
 passport.serializeUser((user: any, done) => {
-  done(null, user._id);
+  done(null, user._id || user.userId);
 });
 
 passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await User.findById(id);
-    done(null, user);
+    if (user) {
+      const hasBiodata = !!(await BiodataServices.getOwnBiodata(user?.userId as string));
+      
+      const latestPayment = await Payment.findOne({ userId: user._id })
+        .sort({ paymentDate: -1 }) 
+        .lean();
+
+      const subscriptionType = latestPayment?.subscriptionType || user.subscriptionType || "free";
+
+      const extendedUser: AuthUser = {
+        userId: user._id.toString(),
+        email: user.email,
+        _id: user._id,
+        name: user.name,
+     
+        gender: user.gender,
+        role: user.role,
+        hasBiodata,
+        subscriptionType,
+        phone: user.phone,
+        isVerified: user.isVerified,
+        agreeToPrivacy: user.agreeToPrivacy,
+        agreeToTerms: user.agreeToTerms,
+        subscriptionId: user.subscriptionId,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      };
+
+      done(null, extendedUser as any);
+    } else {
+      done(null, false);
+    }
   } catch (err) {
     done(err);
   }
