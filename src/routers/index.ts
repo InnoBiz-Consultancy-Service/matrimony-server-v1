@@ -13,6 +13,7 @@ import { ReviewRoutes } from "../app/module/review/review.route";
 import { SpecialOfferRoutes } from "../app/module/specialOffers/specialOffer.route";
 
 
+
 const router = Router();
 
 const moduleROuters = [
@@ -68,7 +69,8 @@ const moduleROuters = [
   {
     path: "/special-offers",
     route: SpecialOfferRoutes,
-  }
+  },
+
 ];
 moduleROuters.forEach((route) => router.use(route.path, route.route));
 export default router;

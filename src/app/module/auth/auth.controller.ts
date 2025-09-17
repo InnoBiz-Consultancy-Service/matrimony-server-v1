@@ -28,11 +28,11 @@ export const loginUser = async (req: Request, res: Response) => {
     }
 
     const user = await UserServices.loginUserFromDB({ email, password });
+const userId = user.userId || user._id.toString();
+    const hasBiodata = !!(await BiodataServices.getOwnBiodata(userId));
 
-    const hasBiodata = !!(await BiodataServices.getOwnBiodata(user?.userId as string));
-
-    const latestPayment = await Payment.findOne({ userId: user?._id })
-      .sort({ paymentDate: -1 }) 
+    const latestPayment = await Payment.findOne({ userId })
+      .sort({ paymentDate: -1 })
       .lean();
 
     const subscriptionType = latestPayment?.subscriptionType || "free";

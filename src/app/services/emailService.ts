@@ -4,7 +4,7 @@ import { transporter } from "../../config/mailer";
 
 export const sendOtpEmail = async (to: string, otp: string) => {
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.SMTP_USER,
     to,
     subject: "Complete Your Nikah Registration - OTP Verification",
     html: `
