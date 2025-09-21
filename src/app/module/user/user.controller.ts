@@ -24,12 +24,7 @@ const registerUser = async (req: Request, res: Response) => {
       });
     }
 
-    const otp = generateOTP();
-
-    await sendOtpEmail(data.email, otp);
-
-    // Step 4: OTP save করো
-    await OtpModel.create({ email: data.email, otp });
+    
 
     const user = await UserServices.registerUserIntoDB({
       ...data,
@@ -117,13 +112,55 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     data: users,
   });
 });
+const resendOtp = catchAsync(async (req: Request, res: Response) => {
+  const { email } = req.body;
 
-// ======================
-// Export Controllers
-// ======================
+  if (!email) {
+    return sendResponse(res, {
+      statusCode: 400,
+      success: false,
+      message: "Email is required",
+      data: null,
+    });
+  }
+
+  // 1. Check if user exists
+  const user = await User.findOne({ email });
+  if (!user) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "User not found",
+      data: null,
+    });
+  }
+
+  // 2. Generate new OTP
+  const newOtp = generateOTP();
+
+  // 3. Send OTP email
+  await sendOtpEmail(email, newOtp);
+
+  // 4. Update OTP in DB (replace old one or create if not exists)
+  await OtpModel.findOneAndUpdate(
+    { email },
+    { otp: newOtp, createdAt: new Date() },
+    { upsert: true }
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "New OTP sent successfully",
+    data: null,
+  });
+});
+
+
 export const UserControllers = {
   registerUser,
   verifyOtp,   
   verifyUser,  
   getAllUsers,
+  resendOtp,
 };

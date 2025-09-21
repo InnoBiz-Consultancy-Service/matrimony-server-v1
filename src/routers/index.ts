@@ -11,6 +11,9 @@ import profileVisitRoutes from "../app/module/profileVisitCount/profileVisit.rou
 import { MailRoutes } from "../app/module/sendMail/sendMail.route";
 import { ReviewRoutes } from "../app/module/review/review.route";
 import { SpecialOfferRoutes } from "../app/module/specialOffers/specialOffer.route";
+import { newslatterSubscriber } from "../app/module/newslatterSubscriber/newslatterSubscriber.route";
+import { ContactRoutes } from "../app/module/contactUs/contactUs.route";
+import { ShortlistRoutes } from "../app/module/shortList/shortList.route";
 
 
 
@@ -70,6 +73,17 @@ const moduleROuters = [
     path: "/special-offers",
     route: SpecialOfferRoutes,
   },
+  {
+    path: "/subscriber",
+    route: newslatterSubscriber,
+  },
+  {
+    path:"/contactUs",
+    route: ContactRoutes
+  },
+  {
+      path:"/shortList",
+    route: ShortlistRoutes  }
 
 ];
 moduleROuters.forEach((route) => router.use(route.path, route.route));

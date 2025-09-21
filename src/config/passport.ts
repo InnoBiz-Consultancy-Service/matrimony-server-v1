@@ -1,16 +1,14 @@
 import passport from "passport";
-import { Strategy as GoogleStrategy, Profile, VerifyCallback } from "passport-google-oauth20";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../app/module/user/user.model";
 import { BiodataServices } from "../app/module/biodata/biodata.service";
 import Payment from "../app/module/payment/payment.model";
-import { AuthUser } from "../app/module/user/user.interface";
+import { AuthUser, SubscriptionType } from "../app/module/user/user.interface";
 
-
-
-
-
-
-
+// Type guard for SubscriptionType validation
+function isValidSubscriptionType(type: any): type is SubscriptionType {
+  return type && ["free", "premium", "vip"].includes(type);
+}
 
 passport.use(
   new GoogleStrategy(
@@ -19,7 +17,7 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       callbackURL: process.env.GOOGLE_CALLBACK_URL!,
     },
-    async (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => {
+    async (accessToken: string, refreshToken: string, profile: any, done: any) => {
       try {
         const email = profile.emails?.[0].value;
         if (!email) return done(null, false, { message: "No email found" });
@@ -29,24 +27,45 @@ passport.use(
           return done(null, false, { message: "User not found. Please sign up first." });
         }
 
-        // Get additional user data
-        const hasBiodata = !!(await BiodataServices.getOwnBiodata(user?.userId as string));
-        
-        const latestPayment = await Payment.findOne({ userId: user._id })
-          .sort({ paymentDate: -1 }) 
-          .lean();
+        // Get additional user data with proper error handling
+        let hasBiodata = false;
+        let subscriptionType: SubscriptionType = "free";
 
-        const subscriptionType = latestPayment?.subscriptionType || user.subscriptionType || "free";
+        try {
+          hasBiodata = !!(await BiodataServices.getOwnBiodata(user.userId as string));
+        } catch (error) {
+          console.warn("Error fetching biodata:", error);
+          hasBiodata = false;
+        }
 
-   
+        try {
+          const latestPayment = await Payment.findOne({ userId: user._id })
+            .sort({ paymentDate: -1 })
+            .lean();
+          
+          // Ensure subscriptionType is of correct type
+          const paymentSubscriptionType = latestPayment?.subscriptionType;
+          if (isValidSubscriptionType(paymentSubscriptionType)) {
+            subscriptionType = paymentSubscriptionType;
+          } else if (isValidSubscriptionType(user.subscriptionType)) {
+            subscriptionType = user.subscriptionType;
+          } else {
+            subscriptionType = "free";
+          }
+        } catch (error) {
+          console.warn("Error fetching payment:", error);
+          subscriptionType = isValidSubscriptionType(user.subscriptionType) 
+            ? user.subscriptionType 
+            : "free";
+        }
+
         const extendedUser: AuthUser = {
-          userId: user._id.toString(),         
+          userId: user._id.toString(),
           email: user.email,
           _id: user._id,
           name: user.name,
-      
           gender: user.gender,
-          role: user.role,
+          role: user.role || "user",
           hasBiodata,
           subscriptionType,
           phone: user.phone,
@@ -58,8 +77,9 @@ passport.use(
           updatedAt: user.updatedAt
         };
 
-        return done(null, extendedUser as any);
+        return done(null, extendedUser);
       } catch (err) {
+        console.error("Google strategy error:", err);
         return done(err);
       }
     }
@@ -74,22 +94,43 @@ passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await User.findById(id);
     if (user) {
-      const hasBiodata = !!(await BiodataServices.getOwnBiodata(user?.userId as string));
-      
-      const latestPayment = await Payment.findOne({ userId: user._id })
-        .sort({ paymentDate: -1 }) 
-        .lean();
+      let hasBiodata = false;
+      let subscriptionType: SubscriptionType = "free";
 
-      const subscriptionType = latestPayment?.subscriptionType || user.subscriptionType || "free";
+      try {
+        hasBiodata = !!(await BiodataServices.getOwnBiodata(user.userId as string));
+      } catch (error) {
+        console.warn("Error fetching biodata in deserialize:", error);
+        hasBiodata = false;
+      }
+
+      try {
+        const latestPayment = await Payment.findOne({ userId: user._id })
+          .sort({ paymentDate: -1 })
+          .lean();
+        
+        const paymentSubscriptionType = latestPayment?.subscriptionType;
+        if (isValidSubscriptionType(paymentSubscriptionType)) {
+          subscriptionType = paymentSubscriptionType;
+        } else if (isValidSubscriptionType(user.subscriptionType)) {
+          subscriptionType = user.subscriptionType;
+        } else {
+          subscriptionType = "free";
+        }
+      } catch (error) {
+        console.warn("Error fetching payment in deserialize:", error);
+        subscriptionType = isValidSubscriptionType(user.subscriptionType) 
+          ? user.subscriptionType 
+          : "free";
+      }
 
       const extendedUser: AuthUser = {
         userId: user._id.toString(),
         email: user.email,
         _id: user._id,
         name: user.name,
-     
         gender: user.gender,
-        role: user.role,
+        role: user.role || "user",
         hasBiodata,
         subscriptionType,
         phone: user.phone,
@@ -101,7 +142,7 @@ passport.deserializeUser(async (id: string, done) => {
         updatedAt: user.updatedAt
       };
 
-      done(null, extendedUser as any);
+      done(null, extendedUser);
     } else {
       done(null, false);
     }

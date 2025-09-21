@@ -10,6 +10,7 @@ const router = express.Router();
 router.post("/register",  catchAsync(UserControllers.registerUser));
 router.get("/all",checkAuth(USER_ROLE.ADMIN),UserControllers.getAllUsers);
 router.post("/verify-otp", UserControllers.verifyOtp);
+router.post("/resend-otp", UserControllers.resendOtp) 
 router.patch("/:id/verify", catchAsync(UserControllers.verifyUser));
 
 
