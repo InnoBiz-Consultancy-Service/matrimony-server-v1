@@ -115,7 +115,7 @@ export interface IBiodata {
   name: string;
   gender: "male" | "female" | string;
   age: number | string;
-
+  phone: string;
   address?: {
     present?: {
       address?: string;
@@ -163,11 +163,11 @@ export interface IBiodata {
   personal?: {
     dress?: string;
     prayerHabit?: string;
-    maintainMahram?: boolean | string;
-    quranReading?: boolean | string;
+    maintainMahram?: string;
+    quranReading?:  string;
     fiqh?: string;
-    entertainment?: boolean | string;
-    healthIssues?: boolean | string;
+    entertainment?: string;
+    healthIssues?: string;
     specialSkills?: string | null;
     favoriteBooks?: string[];
     hobbies?: string[];
@@ -181,7 +181,7 @@ export interface IBiodata {
 
   marriage?: {
     guardiansAgree?: boolean | string;
-    studyContinue?: boolean | string | null;
+    studyContinue?:string ;
     reason?: string;
     jobStatus?: string | null;
   };

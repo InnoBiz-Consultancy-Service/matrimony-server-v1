@@ -7,7 +7,7 @@ interface EnvConfig {
   DB_URL: string;
   NODE_ENV: "development" | "production";
 
-  JWT_ACCESS_SECRET: string;
+  JWT_SECRET: string;
   JWT_ACCESS_EXPIRES: string;
   JWT_REFRESH_SECRET: string;
   JWT_REFRESH_SECRET_EXPIRED: string;
@@ -15,6 +15,8 @@ interface EnvConfig {
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
   GOOGLE_CALLBACK_URL: string;
+  SMTP_USER: string;
+  SMTP_PASS: string;
 }
 
 const loadEnvVariables = (): EnvConfig => {
@@ -24,7 +26,7 @@ const loadEnvVariables = (): EnvConfig => {
     "NODE_ENV",
    
     
-    "JWT_ACCESS_SECRET",
+    "JWT_SECRET",
     "JWT_ACCESS_EXPIRES",
     "JWT_REFRESH_SECRET",
     "JWT_REFRESH_SECRET_EXPIRED",
@@ -32,6 +34,8 @@ const loadEnvVariables = (): EnvConfig => {
     ,"GOOGLE_CLIENT_ID"
     ,"GOOGLE_CLIENT_SECRET"
     ,"GOOGLE_CALLBACK_URL"
+    ,"SMTP_USER"
+    ,"SMTP_PASS"
   ];
 
   requiredEnvVariables.forEach((key) => {
@@ -44,9 +48,9 @@ const loadEnvVariables = (): EnvConfig => {
     PORT: process.env.PORT as string,
     DB_URL: process.env.DB_URL as string,
     NODE_ENV: process.env.NODE_ENV as "development" | "production",
-  
-  
-    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET as string,
+
+
+    JWT_SECRET: process.env.JWT_SECRET as string,
     JWT_ACCESS_EXPIRES: process.env.JWT_ACCESS_EXPIRES as string,
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
     JWT_REFRESH_SECRET_EXPIRED: process.env.JWT_REFRESH_SECRET_EXPIRED as string,
@@ -54,6 +58,8 @@ const loadEnvVariables = (): EnvConfig => {
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
     GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
+    SMTP_USER: process.env.SMTP_USER as string,
+    SMTP_PASS: process.env.SMTP_PASS as string,
 
   };
 };

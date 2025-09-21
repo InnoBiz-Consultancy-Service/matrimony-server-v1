@@ -28,11 +28,11 @@ export const loginUser = async (req: Request, res: Response) => {
     }
 
     const user = await UserServices.loginUserFromDB({ email, password });
+const userId = user.userId || user._id.toString();
+    const hasBiodata = !!(await BiodataServices.getOwnBiodata(userId));
 
-    const hasBiodata = !!(await BiodataServices.getOwnBiodata(user?.userId as string));
-
-    const latestPayment = await Payment.findOne({ userId: user?._id })
-      .sort({ paymentDate: -1 }) 
+    const latestPayment = await Payment.findOne({ userId })
+      .sort({ paymentDate: -1 })
       .lean();
 
     const subscriptionType = latestPayment?.subscriptionType || "free";
@@ -40,9 +40,9 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const accessToken = jwt.sign(
       {
-        userId: user._id,
+        userId: user._id.toString(),
         name: user.name,
-        userEmail: user.email,
+        email: user.email,
         gender: user.gender,
         role: user.role,
         hasBiodata,
@@ -60,7 +60,7 @@ export const loginUser = async (req: Request, res: Response) => {
       success: true,
       message: "Login successful",
       data: {
-        userId: user._id,
+        userId: user._id.toString(),
         name: user.name,
         email: user.email,
         gender: user.gender,
@@ -108,27 +108,30 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
 
 export const googleCallbackController = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as AuthUser | undefined;
+    const user = req.user as AuthUser;
 
     if (!user) {
-      return sendResponse(res, {
-        statusCode: 404,
+      return res.status(404).json({
         success: false,
         message: "User not found. Please sign up first.",
         data: null,
       });
     }
 
+    console.log("Google OAuth User received:", user); // Debug log
 
-    const hasBiodata = !!user?.hasBiodata;
-    const subscriptionType = user?.subscriptionType || "free";
+    // Use the user data that's already been prepared by Passport strategy
+    // No need to re-fetch biodata and subscription - it's already in the user object
+    const hasBiodata = user.hasBiodata || false;
+    const subscriptionType = user.subscriptionType || "free";
 
+    // JWT Payload with the user data from Passport
     const payload = {
-      userId: user?._id,
-      name: user?.name,
-      userEmail: user?.email,
-      gender: user?.gender,
-      role: user?.role,
+      userId: user.userId,
+      name: user.name,
+      email: user.email,
+      gender: user.gender,
+      role: user.role || "user",
       hasBiodata,
       subscriptionType,
     };
@@ -137,20 +140,37 @@ export const googleCallbackController = catchAsync(
       expiresIn: "7d",
     });
 
-    // Cookie set
+    // Set both HTTP-only and regular cookies
     res.cookie("accessToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // Redirect with optional state
-    let redirectTo = req.query.state as string | undefined;
-    if (redirectTo && redirectTo.startsWith("/")) redirectTo = redirectTo.slice(1);
+    res.cookie("token", token, {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-    res.redirect(`${envVars.FRONTEND_URL}/${redirectTo || ""}`);
+    // Set user role cookie for frontend
+    res.cookie("userRole", user.role || "user", {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    // Redirect to frontend
+    let redirectTo = req.query.state as string | undefined;
+    if (redirectTo && redirectTo.startsWith("/")) {
+      redirectTo = redirectTo.slice(1);
+    }
+
+    console.log("Redirecting to:", `${envVars.FRONTEND_URL}}`);
+    
+    res.redirect(`${envVars.FRONTEND_URL}`);
   }
 );
-
 
 

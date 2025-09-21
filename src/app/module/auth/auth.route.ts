@@ -13,6 +13,7 @@ router.post("/logout", catchAsync(logoutUser));
 router.post("/reset-password",resetPassword );
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"], session: false }));
 
+
 // Google callback route
 router.get(
   "/google/callback",

@@ -90,9 +90,17 @@ const getAllBiodata = async (filters: any, currentUserId: string) => {
   }
 
   // Marital status filter
-  if (filters.maritalStatus && filters.maritalStatus.trim() !== "") {
-    conditions.push({ "maritalInfo.maritalStatus": filters.maritalStatus });
-  }
+// Marital status filter
+if (filters.maritalStatus?.trim()) {
+  conditions.push({
+    "preference.maritalStatus": {
+      $regex: `^${filters.maritalStatus.trim()}$`,
+      $options: "i", // case-insensitive
+    },
+  });
+}
+
+
 
   // Education filter
   if (filters.sscGroup && filters.sscGroup.trim() !== "") {

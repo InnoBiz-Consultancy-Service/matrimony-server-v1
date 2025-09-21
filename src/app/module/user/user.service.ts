@@ -1,11 +1,10 @@
 import bcrypt from "bcrypt";
 import { IUser } from "./user.interface";
 import User from "./user.model";
+import AppError from "../../../errors/AppError";
 
 const registerUserIntoDB = async (data: Partial<IUser>): Promise<IUser> => {
   const email = data.email?.toLowerCase().trim();
-  const existingUser = await User.findOne({ email });
-  if (existingUser) throw new Error("Email already taken");
 
   const hashedPassword = await bcrypt.hash(data.password!, 10);
   const user = new User({ ...data, email, password: hashedPassword });
@@ -41,9 +40,22 @@ const verifyUser = async (id: string) => {
 const getAllUsers = async()=>{
   return await User.find();
 }
+const verifyUserByEmail = async (email: string) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
+
+  user.isVerified = true;
+  await user.save();
+
+  return user;
+};
 export const UserServices = {
   registerUserIntoDB,
   loginUserFromDB,
   verifyUser,
-  getAllUsers
+  getAllUsers,
+  verifyUserByEmail,
 };
