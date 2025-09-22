@@ -7,7 +7,7 @@ import { Interest } from "../app/module/interest/interest.route";
 import { AuthRoutes } from "../app/module/auth/auth.route";
 import { subscriptionRoutes } from "../app/module/subscription/subscription.route";
 import { IgnoreRoutes } from "../app/module/ignoreList/ignoreList.route";
-import profileVisitRoutes from "../app/module/profileVisitCount/profileVisit.route";
+import profileVisitRoutes from "../app/module/contactVisitCount/contactVisit.route";
 import { MailRoutes } from "../app/module/sendMail/sendMail.route";
 import { ReviewRoutes } from "../app/module/review/review.route";
 import { SpecialOfferRoutes } from "../app/module/specialOffers/specialOffer.route";
@@ -58,7 +58,7 @@ const moduleROuters = [
     route: IgnoreRoutes,
   },
   {
-    path: "/profile-visit",
+    path: "/contact-visit",
     route: profileVisitRoutes,
   },
   {

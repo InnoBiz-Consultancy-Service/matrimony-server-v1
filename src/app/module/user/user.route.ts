@@ -12,6 +12,7 @@ router.get("/all",checkAuth(USER_ROLE.ADMIN),UserControllers.getAllUsers);
 router.post("/verify-otp", UserControllers.verifyOtp);
 router.post("/resend-otp", UserControllers.resendOtp) 
 router.patch("/:id/verify", catchAsync(UserControllers.verifyUser));
+router.get("/ownProfile",checkAuth(USER_ROLE.USER),UserControllers.getOwnUser)
 
 
 export const UserRoutes = router;

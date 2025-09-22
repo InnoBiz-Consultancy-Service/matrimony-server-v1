@@ -155,6 +155,17 @@ const resendOtp = catchAsync(async (req: Request, res: Response) => {
     data: null,
   });
 });
+const getOwnUser = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user?.userId;
+  const user = await UserServices.getOwnUser(userId!);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Your information fetched successfully",
+    data: user,
+  });
+});
 
 
 export const UserControllers = {
@@ -163,4 +174,5 @@ export const UserControllers = {
   verifyUser,  
   getAllUsers,
   resendOtp,
+  getOwnUser
 };

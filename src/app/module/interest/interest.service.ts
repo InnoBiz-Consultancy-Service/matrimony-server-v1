@@ -34,13 +34,13 @@ const cancelInterest = async (senderId: string, receiverId: string): Promise<IIn
 
 const getSentInterests = async (userId: string) => {
   return await Interest.find({ sender: userId, status: "sent" })
-    .populate("receiver", "name email phone")
+    .populate("receiver", "name ")
     .populate("receiverBiodata"); // ✅ include biodata
 };
 
 const getReceivedInterests = async (userId: string) => {
   return await Interest.find({ receiver: userId, status: "sent" })
-    .populate("sender", "name email phone")
+    .populate("sender", "name ")
     .populate("senderBiodata"); // ✅ include biodata
 };
 

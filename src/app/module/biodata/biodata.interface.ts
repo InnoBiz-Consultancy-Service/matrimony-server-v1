@@ -116,6 +116,7 @@ export interface IBiodata {
   gender: "male" | "female" | string;
   age: number | string;
   phone: string;
+
   address?: {
     present?: {
       address?: string;

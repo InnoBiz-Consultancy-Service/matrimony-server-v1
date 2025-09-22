@@ -3,7 +3,9 @@ import { Types } from "mongoose";
 export interface IVisitedProfile {
   profileId: Types.ObjectId;     
   contactViewed: boolean;  
-  count?: number;       
+  count?: number;
+  email?: string;
+  phone?: string;       
   viewedAt: Date;               
 }
 
