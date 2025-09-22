@@ -39,6 +39,7 @@ export interface AuthUser {
   agreeToPrivacy?: boolean;
   agreeToTerms?: boolean;
   subscriptionId?: Types.ObjectId;
+
   createdAt?: Date;
   updatedAt?: Date;
 }

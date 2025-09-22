@@ -81,7 +81,7 @@ const preferenceSchema = z.object({
   maritalStatus: z.string().default("উত্তর দেয়া হয়নি"),
   profession: z.string().default("উত্তর দেয়া হয়নি"),
   financialCondition: z.string().default("উত্তর দেয়া হয়নি"),
-  qualities: z.array(z.string()).default([]),
+  qualities: z.string().default("উত্তর দেয়া হয়নি"),
 });
 
 // Pledge Schema

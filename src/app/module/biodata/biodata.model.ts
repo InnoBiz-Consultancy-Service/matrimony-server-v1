@@ -120,6 +120,7 @@ const biodataSchema = new Schema<IBiodata>(
     gender: { type: String, enum: ["male", "female"], required: true },
     age: { type: Number, required: true },
 
+
     address: {
       present: {
         address: { type: String, default: "উত্তর দেয়া হয়নি" },

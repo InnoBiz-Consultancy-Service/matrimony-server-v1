@@ -4,13 +4,16 @@ import httpStatus from "http-status-codes";
 import { ApprovalStatus } from "./biodata.interface";
 import { sendResponse } from "../../../utils/sendResponse";
 import catchAsync from "../../../utils/catchAsync";
+import mongoose from "mongoose";
+import Biodata from "./biodata.model";
+import Trash from "../trash/trash.model";
 
 // Create or update own biodata
 const createOrUpdateBiodata = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   const data = req.body;
 
-  const result = await BiodataServices.createOrUpdateBiodata(data, userId!);
+  const result = await BiodataServices.createBiodata(data, userId!);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -35,6 +38,21 @@ const updateOwnBiodata = catchAsync(async (req: Request, res: Response) => {
     success: true,
     message: "Biodata updated successfully",
     data: updatedBiodata,
+  });
+});
+
+// Delete own biodata (soft delete)
+// Delete own biodata (move to Trash)
+const deleteOwnBiodata = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user?.userId;
+
+  const trashedBiodata = await BiodataServices.deleteOwnBiodata(userId!);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Biodata deleted successfully and moved to Trash",
+    data: trashedBiodata,
   });
 });
 
@@ -66,6 +84,7 @@ const getOwnBiodata = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Get biodata by ID
 const getBiodataById = catchAsync(async (req: Request, res: Response) => {
   const biodataId = req.params.id; 
   const currentUserId = req.user?.userId;
@@ -119,6 +138,7 @@ const getPendingBiodata = catchAsync(async (req: Request, res: Response) => {
 export const BiodataControllers = {
   createOrUpdateBiodata,
   updateOwnBiodata,
+  deleteOwnBiodata, // ✅ added
   getAllBiodata,
   getOwnBiodata,
   getBiodataById,

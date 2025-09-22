@@ -105,72 +105,69 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-
 export const googleCallbackController = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as AuthUser;
+    try {
+      const user = req.user as AuthUser;
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found. Please sign up first.",
-        data: null,
+      if (!user) {
+        console.log("❌ Google OAuth: No user found in request");
+        return res.redirect(`${envVars.FRONTEND_URL}/login?error=no_user_found`);
+      }
+
+      console.log("✅ Google OAuth User Received:", {
+        userId: user.userId,
+        email: user.email,
+        name: user.name
       });
+
+      const token = jwt.sign(
+        {
+          userId: user.userId,
+          name: user.name,
+          email: user.email,
+          gender: user.gender,
+          role: user.role || "user",
+          hasBiodata: user.hasBiodata || false,
+          subscriptionType: user.subscriptionType || "free",
+        },
+        process.env.JWT_SECRET || "defaultsecret",
+        { expiresIn: "7d" }
+      );
+
+      // ✅ সঠিক Cookie options
+      const isProduction = process.env.NODE_ENV === "production";
+      
+      const cookieOptions: {
+        httpOnly: boolean;
+        secure: boolean;
+        sameSite: 'lax' | 'strict' | 'none';
+        maxAge: number;
+        path: string;
+        domain?: string;
+      } = {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
+      };
+
+      // Production এলে domain set করুন
+      if (isProduction) {
+        cookieOptions.domain = "http://localhost:3000"; // আপনার actual domain দিবেন
+      }
+
+      res.cookie("accessToken", token, cookieOptions);
+
+      console.log('✅ Google OAuth Cookie Set Successfully');
+
+      // Success redirect with token in URL (fallback)
+      res.redirect(`${envVars.FRONTEND_URL}/auth/success?token=${token}&userId=${user.userId}`);
+      
+    } catch (error) {
+      console.error("❌ Google callback error:", error);
+      res.redirect(`${envVars.FRONTEND_URL}/login?error=server_error`);
     }
-
-    console.log("Google OAuth User received:", user); // Debug log
-
-    // Use the user data that's already been prepared by Passport strategy
-    // No need to re-fetch biodata and subscription - it's already in the user object
-    const hasBiodata = user.hasBiodata || false;
-    const subscriptionType = user.subscriptionType || "free";
-
-    // JWT Payload with the user data from Passport
-    const payload = {
-      userId: user.userId,
-      name: user.name,
-      email: user.email,
-      gender: user.gender,
-      role: user.role || "user",
-      hasBiodata,
-      subscriptionType,
-    };
-
-    const token = jwt.sign(payload, process.env.JWT_SECRET || "defaultsecret", {
-      expiresIn: "7d",
-    });
-
-    // Set both HTTP-only and regular cookies
-    res.cookie("accessToken", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    res.cookie("token", token, {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    // Set user role cookie for frontend
-    res.cookie("userRole", user.role || "user", {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    // Redirect to frontend
-    let redirectTo = req.query.state as string | undefined;
-    if (redirectTo && redirectTo.startsWith("/")) {
-      redirectTo = redirectTo.slice(1);
-    }
-
-    console.log("Redirecting to:", `${envVars.FRONTEND_URL}}`);
-    
-    res.redirect(`${envVars.FRONTEND_URL}`);
   }
 );
-
-

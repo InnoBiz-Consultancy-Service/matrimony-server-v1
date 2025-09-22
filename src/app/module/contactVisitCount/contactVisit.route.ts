@@ -1,17 +1,17 @@
 import express from "express";
-import { ProfileVisitController } from "./profileVisit.controller";
+import { ProfileVisitController } from "./contactVisit.controller";
 import checkAuth from "../../../middlewares/checkAuth";
 import { USER_ROLE } from "../../../types/global";
 
 const router = express.Router();
 
 router.post(
-  "/:biodataId",
+  "/:profileId",
   checkAuth(USER_ROLE.USER),
   ProfileVisitController.viewContactInfo
 );
 router.get(
-  "/profile-view-status",
+  "/contact-view-status",
   checkAuth(USER_ROLE.USER),
   ProfileVisitController.getProfileViewStatus
 );
