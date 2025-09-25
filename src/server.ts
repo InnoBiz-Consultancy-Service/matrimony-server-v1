@@ -27,7 +27,6 @@ const startServer = async () => {
         // Start server
         server = app.listen(envVars.PORT, () => {
             console.log(`✅ Server is listening on port ${envVars.PORT}`);
-            console.log(`📍 Google OAuth URL: https://matrimony-server-v1.vercel.app/api/v1/auth/google`);
         });
     } catch (error) {
         console.error("❌ Server startup error:", error);

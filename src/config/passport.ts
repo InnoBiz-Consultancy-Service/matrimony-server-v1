@@ -34,10 +34,12 @@ passport.use(
           email: user.email,
           role: user.role,
         };
+        console.log("log form passport.ts file: ", authUser);
 
         done(null, authUser);
       } catch (err) {
         done(err);
+        
       }
     }
   )
