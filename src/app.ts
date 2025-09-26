@@ -1,17 +1,15 @@
-
-
+import dotenv from "dotenv";
+dotenv.config();
 import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
+import "./config/passport";
 import router from "./routers";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 import { notFoundHandler } from "./utils/notFound";
 
-import "./config/passport";
-
-console.log("App starting...");
 const app = express();
 
 // Cookie parser
@@ -32,14 +30,13 @@ app.use(
   })
 );
 
-
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-super-secret-session-key',
-  resave: false,
-  saveUninitialized: false,
-  
-}));
-
+app.use(
+  session({
+    secret: process.env.EXPRESS_SESSION_SECRET || "your-super-secret-session-key",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());

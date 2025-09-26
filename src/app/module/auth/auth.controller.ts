@@ -12,8 +12,6 @@ import { envVars } from "../../../config/envConfig";
 import { AuthUser } from "../user/user.interface";
 
 
-
-
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -104,7 +102,6 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
 export const googleCallbackController = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -114,12 +111,6 @@ export const googleCallbackController = catchAsync(
         console.log("❌ Google OAuth: No user found in request");
         return res.redirect(`${envVars.FRONTEND_URL}/login?error=no_user_found`);
       }
-
-      console.log("✅ Google OAuth User Received:", {
-        userId: user.userId,
-        email: user.email,
-        name: user.name
-      });
 
       const token = jwt.sign(
         {
@@ -135,39 +126,99 @@ export const googleCallbackController = catchAsync(
         { expiresIn: "7d" }
       );
 
-      // ✅ সঠিক Cookie options
-      const isProduction = process.env.NODE_ENV === "production";
-      
+      // Simple cookie configuration
       const cookieOptions: {
         httpOnly: boolean;
         secure: boolean;
-        sameSite: 'lax' | 'strict' | 'none';
+        sameSite: "lax" | "strict" | "none";
         maxAge: number;
         path: string;
         domain?: string;
       } = {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
         path: '/',
+        ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && {
+          domain: process.env.COOKIE_DOMAIN
+        })
       };
 
-      // Production এলে domain set করুন
-      if (isProduction) {
-        cookieOptions.domain = "http://localhost:3000"; // আপনার actual domain দিবেন
-      }
-
-      res.cookie("accessToken", token, cookieOptions);
-
-      console.log('✅ Google OAuth Cookie Set Successfully');
-
-      // Success redirect with token in URL (fallback)
-      res.redirect(`${envVars.FRONTEND_URL}/auth/success?token=${token}&userId=${user.userId}`);
+      res.cookie("token", token, cookieOptions);
       
+      console.log('✅ Google OAuth Cookie Set Successfully');
+      
+      res.redirect(`${envVars.FRONTEND_URL}/auth/success?userId=${user.userId}`);
+
     } catch (error) {
       console.error("❌ Google callback error:", error);
       res.redirect(`${envVars.FRONTEND_URL}/login?error=server_error`);
     }
   }
 );
+
+// export const googleCallbackController = catchAsync(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const user = req.user as AuthUser;
+
+//       if (!user) {
+//         console.log("❌ Google OAuth: No user found in request");
+//         return res.redirect(`${envVars.FRONTEND_URL}/login?error=no_user_found`);
+//       }
+
+//       console.log("✅ Google OAuth User Received:", {
+//         userId: user.userId,
+//         email: user.email,
+//         name: user.name
+//       });
+
+//       const token = jwt.sign(
+//         {
+//           userId: user.userId,
+//           name: user.name,
+//           email: user.email,
+//           gender: user.gender,
+//           role: user.role || "user",
+//           hasBiodata: user.hasBiodata || false,
+//           subscriptionType: user.subscriptionType || "free",
+//         },
+//         process.env.JWT_SECRET || "defaultsecret",
+//         { expiresIn: "7d" }
+//       );
+
+//       const isProduction = process.env.NODE_ENV === "production";
+      
+//       const cookieOptions: {
+//         httpOnly: boolean;
+//         secure: boolean;
+//         sameSite: 'lax' | 'strict' | 'none';
+//         maxAge: number;
+//         path: string;
+//         domain?: string;
+//       } = {
+//         httpOnly: true,
+//         secure: isProduction,
+//         sameSite: isProduction ? 'none' : 'lax',
+//         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+//         path: '/',
+//       };
+
+//       if (isProduction) {
+//         cookieOptions.domain = "http://localhost:3000"; 
+//       }
+
+//       res.cookie("accessToken", token, cookieOptions);
+
+//       console.log('✅ Google OAuth Cookie Set Successfully');
+
+//       // Success redirect
+//       res.redirect(`${envVars.FRONTEND_URL}/auth/success?token=${token}&userId=${user.userId}`);
+      
+//     } catch (error) {
+//       console.error("❌ Google callback error:", error);
+//       res.redirect(`${envVars.FRONTEND_URL}/login?error=server_error`);
+//     }
+//   }
+// );
