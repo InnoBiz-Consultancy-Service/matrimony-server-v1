@@ -20,6 +20,7 @@ export interface IUser {
   subscriptionType?: SubscriptionType;
   subscriptionId?: Types.ObjectId;
   hasBiodata?: boolean;
+  isProfileCompleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -35,7 +36,7 @@ export interface AuthUser {
   subscriptionType?: SubscriptionType;
   phone?: string;
   isVerified?: boolean;
-  
+  isProfileCompleted?: boolean;
   agreeToPrivacy?: boolean;
   agreeToTerms?: boolean;
   subscriptionId?: Types.ObjectId;

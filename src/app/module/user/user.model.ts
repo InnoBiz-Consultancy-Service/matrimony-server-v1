@@ -6,14 +6,18 @@ const userSchema = new Schema<IUser>(
   { 
     userId: { type: String, unique: true, sparse: true },
     name: { type: String, required: true },
-    password: { type: String, required: true },
-    gender: { type: String, enum: ["male", "female"] as GenderType[], required: true },
+    password: { type: String, },
+    gender: { type: String, enum: ["male", "female"] as GenderType[], },
     email: { type: String, required: true },
-    phone: { type: String, required: true },
+    phone: { type: String,  },
     role: { type: String, enum: ["user", "admin"] as UserRole[], required: true, default: "user" },
-    agreeToPrivacy: { type: Boolean, required: true },
-    agreeToTerms: { type: Boolean, required: true },
+    agreeToPrivacy: { type: Boolean, },
+    agreeToTerms: { type: Boolean, },
     isVerified: { type: Boolean, default: false },
+      
+    isProfileCompleted: { type: Boolean ,default: false},
+      
+    
     subscriptionType: { type: String, enum: ["free", "premium", "vip"] as SubscriptionType[], default: "free" },
     subscriptionId: { type: Schema.Types.ObjectId, ref: "Subscription", optional: true },
   },
