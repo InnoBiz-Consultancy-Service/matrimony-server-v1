@@ -17,6 +17,7 @@ interface EnvConfig {
   GOOGLE_CALLBACK_URL: string;
   SMTP_USER: string;
   SMTP_PASS: string;
+  SESSION_SECRET: string;
 }
 
 const loadEnvVariables = (): EnvConfig => {
@@ -36,6 +37,7 @@ const loadEnvVariables = (): EnvConfig => {
     ,"GOOGLE_CALLBACK_URL"
     ,"SMTP_USER"
     ,"SMTP_PASS"
+    ,"SESSION_SECRET"
   ];
 
   requiredEnvVariables.forEach((key) => {
@@ -60,6 +62,7 @@ const loadEnvVariables = (): EnvConfig => {
     GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
     SMTP_USER: process.env.SMTP_USER as string,
     SMTP_PASS: process.env.SMTP_PASS as string,
+    SESSION_SECRET: process.env.SESSION_SECRET as string,
 
   };
 };

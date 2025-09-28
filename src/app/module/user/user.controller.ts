@@ -167,9 +167,23 @@ const getOwnUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+ const updateProfileController = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+  const updateData = req.body;
+
+  const updatedUser = await UserServices.updateUserProfile(userId, updateData);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Profile updated successfully",
+    data: updatedUser,
+  });
+});
 
 export const UserControllers = {
   registerUser,
+  updateProfileController,
   verifyOtp,   
   verifyUser,  
   getAllUsers,

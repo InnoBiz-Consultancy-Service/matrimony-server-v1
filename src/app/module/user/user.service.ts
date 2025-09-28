@@ -6,7 +6,9 @@ import AppError from "../../../errors/AppError";
 const registerUserIntoDB = async (data: Partial<IUser>): Promise<IUser> => {
   const email = data.email?.toLowerCase().trim();
   const hashedPassword = await bcrypt.hash(data.password!, 10);
-  const user = new User({ ...data, email, password: hashedPassword });
+    const isProfileCompleted = true;
+
+  const user = new User({ ...data, email, password: hashedPassword, isProfileCompleted });
   return await user.save();
 };
 
@@ -54,6 +56,28 @@ const verifyUserByEmail = async (email: string) => {
 
   return user;
 };
+const updateUserProfile = async (userId: string, updateData: Partial<IUser>) => {
+  // role skip
+  if (updateData.role) delete updateData.role;
+
+  // password hash
+  if (updateData.password) {
+    updateData.password = await bcrypt.hash(updateData.password, 10);
+  }
+
+  // profile complete flag
+  updateData.isProfileCompleted = true;
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { $set: updateData },
+    { new: true, runValidators: true }
+  ).select("-password").populate("subscriptionId");
+
+  if (!updatedUser) throw new AppError(404, "User not found");
+
+  return updatedUser;
+};
 
 const getOwnUser = async (userId: string) => {
   const user = await User.findById(userId)
@@ -73,5 +97,6 @@ export const UserServices = {
   verifyUser,
   getAllUsers,
   verifyUserByEmail,
+  updateUserProfile,
   getOwnUser, 
 };
