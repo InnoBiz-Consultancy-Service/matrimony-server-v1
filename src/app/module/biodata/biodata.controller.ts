@@ -4,23 +4,29 @@ import httpStatus from "http-status-codes";
 import { ApprovalStatus } from "./biodata.interface";
 import { sendResponse } from "../../../utils/sendResponse";
 import catchAsync from "../../../utils/catchAsync";
-import mongoose from "mongoose";
-import Biodata from "./biodata.model";
-import Trash from "../trash/trash.model";
 
 // Create or update own biodata
 const createOrUpdateBiodata = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.userId;
+  const userId = req.user?.userId as string;
   const data = req.body;
 
-  const result = await BiodataServices.createBiodata(data, userId!);
+  const result = await BiodataServices.createBiodata(data, userId);
 
+  // নতুন token cookie-তে পাঠাও
+  res.cookie("token", result.accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: "/",
+  });
   sendResponse(res, {
-    statusCode: httpStatus.OK,
+    statusCode: httpStatus.CREATED,
     success: true,
-    message: "Biodata created/updated successfully",
+    message: "Biodata created successfully",
     data: result,
   });
+
 });
 
 // Update own biodata
