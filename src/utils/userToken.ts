@@ -72,3 +72,13 @@ export const createNewAccessTokenWithRefreshToken = async (
     accessToken,
   };
 };
+import jwt from "jsonwebtoken";
+
+export const checkHasBiodata = (token: string) => {
+  try {
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
+    return { valid: true, hasBiodata: decoded?.hasBiodata === true, decoded };
+  } catch (error) {
+    return { valid: false, hasBiodata: false, decoded: null };
+  }
+};
