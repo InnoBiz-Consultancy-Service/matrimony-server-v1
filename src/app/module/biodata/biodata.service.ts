@@ -183,7 +183,7 @@ if (filters.university && filters.university.trim() !== "") {
 
   const result = await Biodata.find(query).populate(
     "userId",
-    "username  role"
+    "username  "
   );
   return result;
 };
@@ -195,7 +195,7 @@ const getBiodataById = async (biodataId: string, currentUserId: string) => {
 
   const biodata = await Biodata.findOne({
     _id: biodataId,
-  }).populate("userId", "username email role phone");
+  }).populate("userId", "username ");
 
   if (!biodata) return null;
 
