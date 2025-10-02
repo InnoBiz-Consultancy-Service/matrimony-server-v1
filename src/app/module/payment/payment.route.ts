@@ -11,11 +11,12 @@ const router = express.Router();
 // Create a payment (User)
 router.post("/create", auth(USER_ROLE.USER), catchAsync(createPayment));
 
-// Approve a payment (Admin)
-router.put("/approve/:id", auth(USER_ROLE.ADMIN), catchAsync(approvePayment));
 
 // Get all payments (Admin only)
 router.get("/all", auth(USER_ROLE.ADMIN), catchAsync(getAllPayments));
+
+// Approve a payment (Admin)
+router.put("/approve/:id", auth(USER_ROLE.ADMIN), catchAsync(approvePayment));
 
 export const paymentRoutes =  router;
 
