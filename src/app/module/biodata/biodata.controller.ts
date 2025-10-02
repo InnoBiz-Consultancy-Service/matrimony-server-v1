@@ -7,17 +7,26 @@ import catchAsync from "../../../utils/catchAsync";
 
 // Create or update own biodata
 const createOrUpdateBiodata = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.userId;
+  const userId = req.user?.userId as string;
   const data = req.body;
 
-  const result = await BiodataServices.createOrUpdateBiodata(data, userId!);
+  const result = await BiodataServices.createBiodata(data, userId);
 
+  // নতুন token cookie-তে পাঠাও
+  res.cookie("token", result.accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: "/",
+  });
   sendResponse(res, {
-    statusCode: httpStatus.OK,
+    statusCode: httpStatus.CREATED,
     success: true,
-    message: "Biodata created/updated successfully",
+    message: "Biodata created successfully",
     data: result,
   });
+
 });
 
 // Update own biodata
@@ -35,6 +44,21 @@ const updateOwnBiodata = catchAsync(async (req: Request, res: Response) => {
     success: true,
     message: "Biodata updated successfully",
     data: updatedBiodata,
+  });
+});
+
+// Delete own biodata (soft delete)
+// Delete own biodata (move to Trash)
+const deleteOwnBiodata = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user?.userId;
+
+  const trashedBiodata = await BiodataServices.deleteOwnBiodata(userId!);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Biodata deleted successfully and moved to Trash",
+    data: trashedBiodata,
   });
 });
 
@@ -66,6 +90,7 @@ const getOwnBiodata = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Get biodata by ID
 const getBiodataById = catchAsync(async (req: Request, res: Response) => {
   const biodataId = req.params.id; 
   const currentUserId = req.user?.userId;
@@ -119,6 +144,7 @@ const getPendingBiodata = catchAsync(async (req: Request, res: Response) => {
 export const BiodataControllers = {
   createOrUpdateBiodata,
   updateOwnBiodata,
+  deleteOwnBiodata, // ✅ added
   getAllBiodata,
   getOwnBiodata,
   getBiodataById,

@@ -43,11 +43,11 @@ const familySchema = z.object({
 const personalSchema = z.object({
   dress: z.string().default("উত্তর দেয়া হয়নি"),
   prayerHabit: z.string().default("উত্তর দেয়া হয়নি"),
-  maintainMahram: z.boolean().default(false),
-  quranReading: z.boolean().default(false),
+  maintainMahram: z.string().default("উত্তর দেয়া হয়নি"),
+  quranReading: z.string().default("উত্তর দেয়া হয়নি"),
   fiqh: z.string().default("উত্তর দেয়া হয়নি"),
-  entertainment: z.boolean().default(false),
-  healthIssues: z.boolean().default(false),
+  entertainment: z.string().default("উত্তর দেয়া হয়নি"),
+  healthIssues: z.string().default("উত্তর দেয়া হয়নি"),
   specialSkills: z.string().default("উত্তর দেয়া হয়নি"),
   favoriteBooks: z.array(z.string()).default([]),
   hobbies: z.array(z.string()).default([]),
@@ -66,7 +66,7 @@ const occupationSchema = z.object({
 // Marriage Schema
 const marriageSchema = z.object({
   guardiansAgree: z.boolean().default(false),
-  studyContinue: z.boolean().nullable().default(null),
+  studyContinue: z.string().default("উত্তর দেয়া হয়নি"),
   reason: z.string().default("উত্তর দেয়া হয়নি"),
   jobStatus: z.string().default("উত্তর দেয়া হয়নি"),
 });
@@ -81,7 +81,7 @@ const preferenceSchema = z.object({
   maritalStatus: z.string().default("উত্তর দেয়া হয়নি"),
   profession: z.string().default("উত্তর দেয়া হয়নি"),
   financialCondition: z.string().default("উত্তর দেয়া হয়নি"),
-  qualities: z.array(z.string()).default([]),
+  qualities: z.string().default("উত্তর দেয়া হয়নি"),
 });
 
 // Pledge Schema

@@ -6,15 +6,16 @@ import User from "../app/module/user/user.model";
 import AppError from "../errors/AppError";
 
 export const createUserTokens = (user: Partial<IUser>) => {
+
   const jwtPayload = {
-    userId: user._id,
+    userId: user._id ? user._id.toString() : '', 
     email: user.email,
     role: user.role,
   };
 
   const accessToken = generateToken(
     jwtPayload,
-    envVars.JWT_ACCESS_SECRET,
+    envVars.JWT_SECRET,
     envVars.JWT_ACCESS_EXPIRES
   );
 
@@ -56,18 +57,28 @@ export const createNewAccessTokenWithRefreshToken = async (
   }
 
   const jwtPayload = {
-    userId: isUserExist._id,
+    userId: isUserExist._id ? isUserExist._id.toString() : '', // Convert ObjectId to string
     email: isUserExist.email,
     role: isUserExist.role,
   };
 
   const accessToken = generateToken(
     jwtPayload,
-    envVars.JWT_ACCESS_SECRET,
+    envVars.JWT_SECRET,
     envVars.JWT_ACCESS_EXPIRES
   );
 
   return {
     accessToken,
   };
+};
+import jwt from "jsonwebtoken";
+
+export const checkHasBiodata = (token: string) => {
+  try {
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
+    return { valid: true, hasBiodata: decoded?.hasBiodata === true, decoded };
+  } catch (error) {
+    return { valid: false, hasBiodata: false, decoded: null };
+  }
 };

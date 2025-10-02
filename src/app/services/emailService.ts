@@ -4,7 +4,7 @@ import { transporter } from "../../config/mailer";
 
 export const sendOtpEmail = async (to: string, otp: string) => {
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.SMTP_USER,
     to,
     subject: "Complete Your Nikah Registration - OTP Verification",
     html: `
@@ -314,7 +314,7 @@ export const sendOtpEmail = async (to: string, otp: string) => {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log("OTP sent:", info.response);
+    // console.log("OTP sent:", info.response);
     return info;
   } catch (error) {
     console.error("Error sending OTP email:", error);

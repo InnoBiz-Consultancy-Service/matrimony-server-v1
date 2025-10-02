@@ -13,10 +13,12 @@ const router = express.Router();
 // biodata.routes.ts
 router.post("/", checkAuth(USER_ROLE.USER), validateRequest(biodataSchema), BiodataControllers.createOrUpdateBiodata);
 router.patch("/", checkAuth(USER_ROLE.USER), BiodataControllers.updateOwnBiodata);
-router.get("/all", checkAuth(USER_ROLE.ADMIN,USER_ROLE.USER), BiodataControllers.getAllBiodata);
+router.get("/all", BiodataControllers.getAllBiodata);
+router.delete("/",checkAuth(USER_ROLE.USER),BiodataControllers.deleteOwnBiodata)
 router.get("/my-biodata", checkAuth(USER_ROLE.USER), BiodataControllers.getOwnBiodata);
 router.get("/pending", checkAuth(USER_ROLE.ADMIN), BiodataControllers.getPendingBiodata);
-router.get("/:id", checkAuth(USER_ROLE.ADMIN,USER_ROLE.USER), BiodataControllers.getBiodataById);
+router.get("/:id", BiodataControllers.getBiodataById);
+
 router.patch("/approval/:id", checkAuth(USER_ROLE.ADMIN), BiodataControllers.approveOrRejectBiodata);
 
 

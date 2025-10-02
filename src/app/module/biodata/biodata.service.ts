@@ -1,61 +1,70 @@
 import Biodata from "./biodata.model";
 import { ApprovalStatus, IBiodata } from "./biodata.interface";
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
 import User from "../user/user.model";
-import { createUserTokens } from "../../../utils/userToken";
+import { checkHasBiodata, createUserTokens } from "../../../utils/userToken";
 import { Ignore } from "../ignoreList/ignoreList.model";
-const createOrUpdateBiodata = async (data: IBiodata, userId: string) => {
+import Trash from "../trash/trash.model";
 
+const createBiodata = async (data: IBiodata, userId: string) => {
   const user = await User.findById(userId);
   if (!user) {
     throw new Error("User does not exist. Cannot create biodata.");
   }
 
-
-  let biodata = await Biodata.findOne({ userId });
-  if (biodata) {
- 
-    biodata = await Biodata.findOneAndUpdate(
-      { userId },
-      { ...data, isApproved: ApprovalStatus.PENDING }, 
-      { new: true }
-    );
-  } else {
-
-    const newBiodata = new Biodata({ ...data, userId });
-    biodata = await newBiodata.save();
+  // Check if biodata already exists
+  const existingBiodata = await Biodata.findOne({ userId });
+  if (existingBiodata) {
+    throw new Error("Biodata already exists for this user.");
   }
 
-  // 3. Generate access token
+  // Create new biodata
+  const biodata = new Biodata({ ...data, userId });
+  await biodata.save();
+
+  // Generate access token
   const { accessToken } = createUserTokens({
     ...user.toObject(),
     hasBiodata: true,
   });
+const { valid, hasBiodata, decoded } = checkHasBiodata(accessToken);
 
-  return { biodata, accessToken };
+  return { 
+    biodata, 
+    accessToken, 
+    tokenValid: valid, 
+    hasBiodata, 
+    decodedToken: decoded 
+  };
+
 };
-
-
 
 const updateOwnBiodata = async (
   userId: string,
   updateData: Partial<IBiodata>
 ) => {
-  return await Biodata.findOneAndUpdate({ userId }, updateData, { new: true });
+  return await Biodata.findOneAndUpdate(
+    { userId,  },
+    updateData,
+    { new: true }
+  );
 };
 
 const getAllBiodata = async (filters: any, currentUserId: string) => {
   const conditions: any[] = [];
 
- conditions.push({ isApproved: ApprovalStatus.APPROVED });
+  conditions.push({ isApproved: ApprovalStatus.APPROVED });
 
-   const ignored = await Ignore.find({ user: currentUserId }).select("ignoredUser");
+
+  const ignored = await Ignore.find({ user: currentUserId }).select(
+    "ignoredUser"
+  );
   const ignoredIds = ignored.map((i) => i.ignoredUser);
   if (ignoredIds.length > 0) {
     conditions.push({ userId: { $nin: ignoredIds } });
   }
-  // Name filter
+
+    // Name filter
   if (filters.name && filters.name.trim() !== "") {
     conditions.push({ name: { $regex: filters.name, $options: "i" } });
   }
@@ -65,15 +74,26 @@ const getAllBiodata = async (filters: any, currentUserId: string) => {
     conditions.push({ gender: filters.gender });
   }
 
-  // Age range filter
-  if (filters.minAge || filters.maxAge) {
-    const ageCondition: any = {};
-    if (filters.minAge && !isNaN(Number(filters.minAge)))
-      ageCondition.$gte = Number(filters.minAge);
-    if (filters.maxAge && !isNaN(Number(filters.maxAge)))
-      ageCondition.$lte = Number(filters.maxAge);
+// Age range filter (improved)
+if (filters.minAge || filters.maxAge) {
+  const ageCondition: any = {};
+  if (filters.minAge && !isNaN(Number(filters.minAge))) {
+    ageCondition.$gte = Number(filters.minAge);
+  }
+  if (filters.maxAge && !isNaN(Number(filters.maxAge))) {
+    ageCondition.$lte = Number(filters.maxAge);
+  }
+  if (Object.keys(ageCondition).length > 0) {
     conditions.push({ age: ageCondition });
   }
+}
+
+// University filter
+if (filters.university && filters.university.trim() !== "") {
+  conditions.push({
+    "education.university": { $regex: filters.university, $options: "i" },
+  });
+}
 
   // Address filters
   if (filters.division && filters.division.trim() !== "") {
@@ -159,33 +179,26 @@ const getAllBiodata = async (filters: any, currentUserId: string) => {
     }
   });
 
-  // ✅ Final query (always checks approvalStatus true)
   const query = { $and: conditions };
 
   const result = await Biodata.find(query).populate(
     "userId",
-    "username email role phone"
+    "username  role"
   );
   return result;
 };
-
-
-
 
 const getBiodataById = async (biodataId: string, currentUserId: string) => {
   if (!mongoose.Types.ObjectId.isValid(biodataId)) {
     throw new Error("Invalid biodata ID");
   }
 
- 
-  const biodata = await Biodata.findById(biodataId).populate(
-    "userId",
-    "username email role phone"
-  );
+  const biodata = await Biodata.findOne({
+    _id: biodataId,
+  }).populate("userId", "username email role phone");
 
   if (!biodata) return null;
 
-  // Ignore check
   const isIgnored = await Ignore.findOne({
     user: new mongoose.Types.ObjectId(currentUserId),
     ignoredUser: biodata.userId._id,
@@ -195,8 +208,6 @@ const getBiodataById = async (biodataId: string, currentUserId: string) => {
 
   return biodata;
 };
-
-
 
 const approveOrRejectBiodata = async (id: string, status: ApprovalStatus) => {
   if (![ApprovalStatus.APPROVED, ApprovalStatus.REJECTED].includes(status)) {
@@ -210,12 +221,10 @@ const approveOrRejectBiodata = async (id: string, status: ApprovalStatus) => {
   );
 };
 
-// Get pending biodata
 const getPendingBiodata = async () => {
-  return await Biodata.find({ isApproved: ApprovalStatus.PENDING }).populate(
-    "userId",
-    "username email role phone"
-  );
+  return await Biodata.find({
+    isApproved: ApprovalStatus.PENDING,
+  }).populate("userId", "username email role phone");
 };
 
 const getOwnBiodata = async (userId: string) => {
@@ -228,12 +237,35 @@ const getOwnBiodata = async (userId: string) => {
   }).populate("userId", "username email role");
 };
 
+const deleteOwnBiodata = async (userId: string) => {
+
+
+ 
+  const biodata = await Biodata.findOne({ userId });
+  if (!biodata) {
+    throw new Error("Biodata not found");
+  }
+
+
+  const trashed = new Trash({
+  data: JSON.parse(JSON.stringify(biodata)), 
+      deletedAt: new Date(),
+  });
+
+  await trashed.save();
+
+  await Biodata.deleteOne({ userId });
+
+  return trashed;
+};
+
 export const BiodataServices = {
-  createOrUpdateBiodata,
+  createBiodata,
   updateOwnBiodata,
   getAllBiodata,
   getBiodataById,
   approveOrRejectBiodata,
   getPendingBiodata,
   getOwnBiodata,
+  deleteOwnBiodata, 
 };

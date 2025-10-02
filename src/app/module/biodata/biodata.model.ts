@@ -110,13 +110,16 @@
 
 import { Schema, model } from "mongoose";
 import { ApprovalStatus, IBiodata } from "./biodata.interface";
+import { string } from "zod";
 
 const biodataSchema = new Schema<IBiodata>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    phone:{type:String,ref:"User"},
     name: { type: String, required: true },
     gender: { type: String, enum: ["male", "female"], required: true },
     age: { type: Number, required: true },
+
 
     address: {
       present: {
@@ -148,6 +151,7 @@ const biodataSchema = new Schema<IBiodata>(
         },
       ],
       other: [{ type: String }],
+     
     },
 
     family: {
@@ -167,11 +171,11 @@ const biodataSchema = new Schema<IBiodata>(
     personal: {
       dress: { type: String, default: "উত্তর দেয়া হয়নি" },
       prayerHabit: { type: String, default: "উত্তর দেয়া হয়নি" },
-      maintainMahram: { type: Schema.Types.Mixed, default: false },
-      quranReading: { type: Schema.Types.Mixed, default: false },
+      maintainMahram: { type: String, default: false },
+      quranReading: { type: String,default: false },
       fiqh: { type: String, default: "উত্তর দেয়া হয়নি" },
-      entertainment: { type: Schema.Types.Mixed, default: false },
-      healthIssues: { type: Schema.Types.Mixed, default: false },
+      entertainment: { type: String, default: false },
+      healthIssues: { type:String, default: false },
       specialSkills: { type: String, default: "উত্তর দেয়া হয়নি" },
       favoriteBooks: [{ type: String }],
       hobbies: [{ type: String }],
@@ -188,7 +192,7 @@ const biodataSchema = new Schema<IBiodata>(
 
     marriage: {
       guardiansAgree: { type: Schema.Types.Mixed, default: false },
-      studyContinue: { type: Schema.Types.Mixed, default: null },
+      studyContinue: {type:String, default: null },
       reason: { type: String, default: "উত্তর দেয়া হয়নি" },
       jobStatus: { type: String, default: "উত্তর দেয়া হয়নি" },
     },
