@@ -192,7 +192,7 @@ const biodataSchema = new Schema<IBiodata>(
 
     marriage: {
       guardiansAgree: { type: Schema.Types.Mixed, default: false },
-      studyContinue: {type:Boolean, default: null },
+      studyContinue: {type:String, default: null },
       reason: { type: String, default: "উত্তর দেয়া হয়নি" },
       jobStatus: { type: String, default: "উত্তর দেয়া হয়নি" },
     },
