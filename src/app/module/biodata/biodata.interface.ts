@@ -155,6 +155,7 @@ export interface IBiodata {
     brothers?: number | string;
     sisters?: number | string;
     sistersInfo?: string[];
+    brothersInfo?: string[];
     unclesProfession?: string[];
     financialStatus?: string;
     financialDetails?: string;
