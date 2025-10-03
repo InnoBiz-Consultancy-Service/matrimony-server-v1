@@ -24,7 +24,7 @@ const approvePayment = async (paymentId: string) => {
   const durationInMonths = payment.durationInMonths || 1
 
   // Subscription
-  const profileViewLimit = payment.subscriptionType === "vip" ? 300 : 100
+  const profileViewLimit = payment.subscriptionType === "vip" ? 10000 : 100
   const startDate = new Date()
   const endDate = new Date(new Date().setMonth(startDate.getMonth() + durationInMonths))
 
