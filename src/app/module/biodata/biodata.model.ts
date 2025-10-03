@@ -162,6 +162,7 @@ const biodataSchema = new Schema<IBiodata>(
       brothers: { type: Number, default: 0 },
       sisters: { type: Number, default: 0 },
       sistersInfo: [{ type: String }],
+      brothersInfo: [{ type: String }],
       unclesProfession: [{ type: String }],
       financialStatus: { type: String, default: "উত্তর দেয়া হয়নি" },
       financialDetails: { type: String, default: "উত্তর দেয়া হয়নি" },

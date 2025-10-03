@@ -32,6 +32,7 @@ const familySchema = z.object({
   motherProfession: z.string().default("উত্তর দেয়া হয়নি"),
   brothers: z.number().default(0),
   sisters: z.number().default(0),
+  brothersInfo: z.array(z.string()).default([]),
   sistersInfo: z.array(z.string()).default([]),
   unclesProfession: z.array(z.string()).default([]),
   financialStatus: z.string().default("উত্তর দেয়া হয়নি"),
