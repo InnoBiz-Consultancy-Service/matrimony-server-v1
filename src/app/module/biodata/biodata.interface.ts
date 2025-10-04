@@ -171,6 +171,8 @@ export interface IBiodata {
     entertainment?: string;
     healthIssues?: string;
     specialSkills?: string | null;
+    height?: string;
+    maritalStatus?: string;
     favoriteBooks?: string[];
     hobbies?: string[];
   };
