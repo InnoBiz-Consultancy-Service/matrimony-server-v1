@@ -179,6 +179,8 @@ const biodataSchema = new Schema<IBiodata>(
       healthIssues: { type:String, default: false },
       specialSkills: { type: String, default: "উত্তর দেয়া হয়নি" },
       favoriteBooks: [{ type: String }],
+      height:{type:String, default: "উত্তর দেয়া হয়নি" },
+      maritalStatus :{type:String, default: "উত্তর দেয়া হয়নি" },
       hobbies: [{ type: String }],
     },
 
