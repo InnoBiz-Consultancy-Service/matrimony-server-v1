@@ -28,6 +28,7 @@ export const createPayment = async (req: Request, res: Response) => {
 export const approvePayment = async (req: Request, res: Response) => {
   try {
     const paymentId = req.params.id;
+ 
 
     if (!mongoose.Types.ObjectId.isValid(paymentId)) {
       return sendResponse(res, {

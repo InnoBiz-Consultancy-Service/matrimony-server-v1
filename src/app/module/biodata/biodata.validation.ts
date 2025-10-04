@@ -52,6 +52,8 @@ const personalSchema = z.object({
   specialSkills: z.string().default("উত্তর দেয়া হয়নি"),
   favoriteBooks: z.array(z.string()).default([]),
   hobbies: z.array(z.string()).default([]),
+  height: z.string().default("উত্তর দেয়া হয়নি"),
+  maritalStatus: z.string().default("উত্তর দেয়া হয়নি"),
 });
 
 // Occupation Schema
