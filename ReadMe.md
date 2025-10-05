@@ -211,8 +211,8 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-  "name": "Sanjid Jeem",
-  "gender": "male",
+  "name": "Sabiha sayana",
+  "gender": "female",
   "age": 24,
   "address": {
     "present": {
