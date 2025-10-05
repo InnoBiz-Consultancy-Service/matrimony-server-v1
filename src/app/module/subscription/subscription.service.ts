@@ -24,9 +24,9 @@ const activateSubscription = async (id: string) => {
 
   // determine default limit if not already set
   if (!sub.profileViewLimit || sub.profileViewLimit === 0) {
-    if (sub.subscriptionType === "premium") sub.profileViewLimit = 20;
-    else if (sub.subscriptionType === "vip") sub.profileViewLimit = 100;
-    else sub.profileViewLimit = 5;
+    if (sub.subscriptionType === "premium") sub.profileViewLimit = 100;
+    else if (sub.subscriptionType === "vip") sub.profileViewLimit = 10000;
+    else sub.profileViewLimit = 0;
   }
 
   await sub.save();
