@@ -2,7 +2,7 @@ import Biodata from "./biodata.model";
 import { ApprovalStatus, IBiodata } from "./biodata.interface";
 import mongoose from "mongoose";
 import User from "../user/user.model";
-import { createUserTokens } from "../../../utils/userToken";
+import { checkHasBiodata, createUserTokens } from "../../../utils/userToken";
 import { Ignore } from "../ignoreList/ignoreList.model";
 import Trash from "../trash/trash.model";
 
@@ -27,8 +27,16 @@ const createBiodata = async (data: IBiodata, userId: string) => {
     ...user.toObject(),
     hasBiodata: true,
   });
+const { valid, hasBiodata, decoded } = checkHasBiodata(accessToken);
 
-  return { biodata, accessToken };
+  return { 
+    biodata, 
+    accessToken, 
+    tokenValid: valid, 
+    hasBiodata, 
+    decodedToken: decoded 
+  };
+
 };
 
 const updateOwnBiodata = async (
@@ -56,13 +64,126 @@ const getAllBiodata = async (filters: any, currentUserId: string) => {
     conditions.push({ userId: { $nin: ignoredIds } });
   }
 
-  // ... rest of your filter conditions remain same ...
+    // Name filter
+  if (filters.name && filters.name.trim() !== "") {
+    conditions.push({ name: { $regex: filters.name, $options: "i" } });
+  }
+
+  // Gender filter
+  if (filters.gender && filters.gender.trim() !== "") {
+    conditions.push({ gender: filters.gender });
+  }
+
+// Age range filter (improved)
+if (filters.minAge || filters.maxAge) {
+  const ageCondition: any = {};
+  if (filters.minAge && !isNaN(Number(filters.minAge))) {
+    ageCondition.$gte = Number(filters.minAge);
+  }
+  if (filters.maxAge && !isNaN(Number(filters.maxAge))) {
+    ageCondition.$lte = Number(filters.maxAge);
+  }
+  if (Object.keys(ageCondition).length > 0) {
+    conditions.push({ age: ageCondition });
+  }
+}
+
+// University filter
+if (filters.university && filters.university.trim() !== "") {
+  conditions.push({
+    "education.university": { $regex: filters.university, $options: "i" },
+  });
+}
+
+  // Address filters
+  if (filters.division && filters.division.trim() !== "") {
+    conditions.push({ "address.present.division": filters.division });
+  }
+  if (filters.district && filters.district.trim() !== "") {
+    conditions.push({ "address.present.district": filters.district });
+  }
+  if (filters.upazila && filters.upazila.trim() !== "") {
+    conditions.push({ "address.present.upazila": filters.upazila });
+  }
+  if (filters.country && filters.country.trim() !== "") {
+    conditions.push({ "address.present.country": filters.country });
+  }
+
+  // Marital status filter
+  if (filters.maritalStatus && filters.maritalStatus.trim() !== "") {
+    conditions.push({ "maritalInfo.maritalStatus": filters.maritalStatus });
+  }
+
+  // Education filter
+  if (filters.sscGroup && filters.sscGroup.trim() !== "") {
+    conditions.push({ "education.sscGroup": filters.sscGroup });
+  }
+  if (filters.sscResult && filters.sscResult.trim() !== "") {
+    conditions.push({ "education.sscResult": filters.sscResult });
+  }
+  if (filters.hscGroup && filters.hscGroup.trim() !== "") {
+    conditions.push({ "education.hscGroup": filters.hscGroup });
+  }
+  if (filters.hscResult && filters.hscResult.trim() !== "") {
+    conditions.push({ "education.hscResult": filters.hscResult });
+  }
+  if (filters.honours && filters.honours.trim() !== "") {
+    conditions.push({
+      "education.honours": { $regex: filters.honours, $options: "i" },
+    });
+  }
+
+  // Physical info
+  if (filters.height && filters.height.trim() !== "") {
+    conditions.push({ "physicalInfo.height": filters.height });
+  }
+  if (filters.bodyColor && filters.bodyColor.trim() !== "") {
+    conditions.push({ "physicalInfo.bodyColor": filters.bodyColor });
+  }
+
+  // Preference
+  if (filters.educationLevel && filters.educationLevel.trim() !== "") {
+    conditions.push({ "preference.educationLevel": filters.educationLevel });
+  }
+  if (filters.religiousPractice && filters.religiousPractice.trim() !== "") {
+    conditions.push({
+      "preference.religiousPractice": filters.religiousPractice,
+    });
+  }
+
+  // Generic approach: Add any new field from filters automatically
+  Object.keys(filters).forEach((key) => {
+    if (
+      ![
+        "name",
+        "gender",
+        "minAge",
+        "maxAge",
+        "division",
+        "district",
+        "upazila",
+        "country",
+        "maritalStatus",
+        "sscGroup",
+        "sscResult",
+        "hscGroup",
+        "hscResult",
+        "honours",
+        "height",
+        "bodyColor",
+        "educationLevel",
+        "religiousPractice",
+      ].includes(key)
+    ) {
+      conditions.push({ [key]: { $regex: filters[key], $options: "i" } });
+    }
+  });
 
   const query = { $and: conditions };
 
   const result = await Biodata.find(query).populate(
     "userId",
-    "username  role"
+    "username  "
   );
   return result;
 };
@@ -74,7 +195,7 @@ const getBiodataById = async (biodataId: string, currentUserId: string) => {
 
   const biodata = await Biodata.findOne({
     _id: biodataId,
-  }).populate("userId", "username email role phone");
+  }).populate("userId", "username ");
 
   if (!biodata) return null;
 

@@ -155,6 +155,7 @@ export interface IBiodata {
     brothers?: number | string;
     sisters?: number | string;
     sistersInfo?: string[];
+    brothersInfo?: string[];
     unclesProfession?: string[];
     financialStatus?: string;
     financialDetails?: string;
@@ -170,6 +171,8 @@ export interface IBiodata {
     entertainment?: string;
     healthIssues?: string;
     specialSkills?: string | null;
+    height?: string;
+    maritalStatus?: string;
     favoriteBooks?: string[];
     hobbies?: string[];
   };

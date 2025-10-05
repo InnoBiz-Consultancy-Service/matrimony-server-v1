@@ -16,7 +16,7 @@ router.post("/create", auth(USER_ROLE.USER), catchAsync(createPayment));
 router.get("/all", auth(USER_ROLE.ADMIN), catchAsync(getAllPayments));
 
 // Approve a payment (Admin)
-router.put("/approve/:id", auth(USER_ROLE.ADMIN), catchAsync(approvePayment));
+router.patch("/approve/:id", auth(USER_ROLE.ADMIN), catchAsync(approvePayment));
 
 export const paymentRoutes =  router;
 

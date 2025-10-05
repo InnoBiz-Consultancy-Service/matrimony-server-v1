@@ -2,7 +2,7 @@
 
 A comprehensive backend API for a matrimonial website built with Node.js, Express.js, TypeScript, and MongoDB. This platform facilitates matchmaking by allowing users to create detailed biodata profiles, search for compatible matches, and manage subscriptions for premium features.
 
-## 🚀 Features
+## Features
 
 ### Authentication & Authorization
 - User registration and login with JWT authentication
@@ -14,20 +14,13 @@ A comprehensive backend API for a matrimonial website built with Node.js, Expres
 ### User Management
 - User profile creation and verification
 - Admin user management
-- Email verification system
+- Profile completion tracking
 
 ### Biodata Management
-- Comprehensive biodata creation with multiple sections:
-  - Personal information
-  - Address details (Present/Permanent)
-  - Education history
-  - Family information
-  - Personal preferences
-  - Occupation details
-  - Marriage preferences
-  - Partner preferences
+- Comprehensive biodata creation with multiple sections including personal information, address details, education history, family information, occupation details, and marriage preferences
 - Biodata approval system by admin
 - Advanced filtering and search capabilities
+- Profile status tracking (pending/approved)
 
 ### Subscription & Payment System
 - Multiple subscription tiers (Free, Premium, VIP)
@@ -36,9 +29,10 @@ A comprehensive backend API for a matrimonial website built with Node.js, Expres
 - Subscription management and expiration handling
 
 ### Interest & Interaction System
-- Send/cancel interest to other profiles
+- Send and cancel interest to other profiles
 - Track sent and received interests
-- Ignore/unignore user functionality
+- Ignore and unignore user functionality
+- Shortlist profiles for later review
 
 ### Profile Visit Tracking
 - Track profile visits and contact info views
@@ -48,24 +42,25 @@ A comprehensive backend API for a matrimonial website built with Node.js, Expres
 ### Review System
 - User reviews with rating system
 - Admin approval for reviews
-- Review management (CRUD operations)
+- Complete review management (CRUD operations)
 
 ### Communication
 - Admin email broadcast system
 - Individual user email communication
-- Email templates and tracking
+- Newsletter subscription management
+- Contact form for user inquiries
 
 ### Special Offers
 - Admin-managed special offers
 - Time-based offer validity
-- Offer activation/deactivation
+- Dynamic pricing and promotions
 
 ### Location Management
 - Bangladesh administrative divisions integration
 - Division, District, and Upazila data
 - Location-based filtering
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend**: Node.js, Express.js
 - **Language**: TypeScript
@@ -76,13 +71,13 @@ A comprehensive backend API for a matrimonial website built with Node.js, Expres
 - **Validation**: Zod
 - **Security**: bcrypt for password hashing
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js (v14 or higher)
 - MongoDB (v4 or higher)
 - npm or yarn package manager
 
-## ⚙️ Installation
+## Installation
 
 1. **Clone the repository**
    ```bash
@@ -96,7 +91,9 @@ A comprehensive backend API for a matrimonial website built with Node.js, Expres
    ```
 
 3. **Environment Setup**
+   
    Create a `.env` file in the root directory:
+   
    ```env
    # Database
    MONGODB_URI=mongodb://localhost:27017/matrimonial
@@ -137,177 +134,497 @@ A comprehensive backend API for a matrimonial website built with Node.js, Expres
    npm start
    ```
 
-## 🌐 Live API
+## Live API
 
 **Base URL**: `https://matrimony-server-v1.vercel.app`
 
-## 📚 API Endpoints
+**Local URL**: `http://localhost:5000`
+
+## API Documentation
 
 ### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/auth/login` | User login |
-| POST | `/api/v1/auth/logout` | User logout |
-| POST | `/api/v1/auth/reset-password` | Reset password |
-| GET | `/api/v1/auth/google` | Google OAuth login |
-| GET | `/api/v1/auth/google/callback` | Google OAuth callback |
+
+#### Login
+```http
+POST /api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "Abcd@1234"
+}
+```
+
+#### Logout
+```http
+POST /api/v1/auth/logout
+```
+
+#### Google OAuth
+```http
+GET /api/v1/auth/google
+```
 
 ### User Management
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/users/register` | User registration |
-| GET | `/api/v1/users/all` | Get all users (Admin) |
-| PATCH | `/api/v1/users/:id/verify` | Verify user (Admin) |
 
-### OTP Management
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/otp/send` | Send OTP to email |
-| POST | `/api/v1/otp/verify` | Verify OTP |
+#### Register User
+```http
+POST /api/v1/user/register
+Content-Type: application/json
+
+{
+  "name": "Redwan Reyad",
+  "email": "user@example.com",
+  "password": "Abcd@1234",
+  "phone": "01777777789",
+  "picture": "https://example.com/pic.jpg",
+  "address": "Dhaka, Bangladesh",
+  "gender": "male",
+  "agreeToPrivacy": true,
+  "agreeToTerms": true
+}
+```
+
+#### Get Own Profile
+```http
+GET /api/v1/biodata/:userId
+Authorization: Bearer <token>
+```
+
+#### Update Profile
+```http
+PATCH /api/v1/user/profile/:userId
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "gender": "female"
+}
+```
 
 ### Biodata Management
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/biodata` | Create/Update biodata |
-| PATCH | `/api/v1/biodata` | Update own biodata |
-| GET | `/api/v1/biodata/all` | Get all approved biodata |
-| GET | `/api/v1/biodata/my-biodata` | Get own biodata |
-| GET | `/api/v1/biodata/pending` | Get pending biodata (Admin) |
-| GET | `/api/v1/biodata/:id` | Get biodata by ID |
-| PATCH | `/api/v1/biodata/approval/:id` | Approve/Reject biodata (Admin) |
+
+#### Create/Update Biodata
+```http
+POST /api/v1/biodata
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "Sanjid Jeem",
+  "gender": "male",
+  "age": 24,
+  "address": {
+    "present": {
+      "address": "Banani, Dhaka",
+      "upazila": "Banani",
+      "district": "Dhaka",
+      "division": "Dhaka"
+    },
+    "permanent": {
+      "address": "Gazipur Sadar",
+      "upazila": "Gazipur",
+      "district": "Gazipur",
+      "division": "Dhaka"
+    },
+    "grewUpAt": "Dhaka",
+    "country": "Bangladesh"
+  },
+  "education": {
+    "method": "General",
+    "history": [
+      {
+        "level": "SSC",
+        "year": 2019,
+        "group": "Science",
+        "result": "GPA 5.00",
+        "subject": "Science",
+        "institution": "Sataish School & College"
+      }
+    ],
+    "other": ["Web Development Course"]
+  },
+  "family": {
+    "fatherAlive": true,
+    "motherAlive": true,
+    "fatherProfession": "Businessman",
+    "motherProfession": "Housewife",
+    "brothers": 1,
+    "sisters": 2,
+    "financialStatus": "Middle Class"
+  },
+  "personal": {
+    "dress": "Hijab + Abaya",
+    "prayerHabit": "Regular",
+    "maintainMahram": true,
+    "quranReading": true,
+    "fiqh": "Hanafi"
+  },
+  "occupation": {
+    "current": "Student & Web Developer",
+    "description": "Frontend developer",
+    "income": {
+      "amount": 15000,
+      "currency": "BDT"
+    }
+  },
+  "preference": {
+    "ageRange": "25-30",
+    "complexion": "Fair",
+    "height": "5'6\"+",
+    "education": "Graduate",
+    "location": "Dhaka or nearby"
+  },
+  "pledge": {
+    "parentsAware": true,
+    "informationAccurate": true,
+    "nikahResponsibility": true
+  }
+}
+```
+
+#### Get All Biodata
+```http
+GET /api/v1/biodata/all
+Authorization: Bearer <token>
+```
+
+#### Get Own Biodata
+```http
+GET /api/v1/biodata/my-biodata
+Authorization: Bearer <token>
+```
+
+#### Get Biodata by ID
+```http
+GET /api/v1/biodata/:biodataId
+Authorization: Bearer <token>
+```
+
+#### Get Pending Biodatas (Admin)
+```http
+GET /api/v1/biodata/pending
+Authorization: Bearer <token>
+```
+
+#### Approve Biodata (Admin)
+```http
+PATCH /api/v1/biodata/approval/:biodataId
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "approved"
+}
+```
+
+#### Delete Own Biodata
+```http
+DELETE /api/v1/biodata
+Authorization: Bearer <token>
+```
+
+### Subscription Management
+
+#### Get All Subscriptions
+```http
+GET /api/v1/subscription/all
+Authorization: Bearer <token>
+```
+
+#### Activate Subscription (Admin)
+```http
+PATCH /api/v1/subscription/activate/:subscriptionId
+Authorization: Bearer <token>
+```
+
+#### Expire Subscription (Admin)
+```http
+PATCH /api/v1/subscription/expire/:subscriptionId
+Authorization: Bearer <token>
+```
 
 ### Interest Management
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/interest/send` | Send interest |
-| PATCH | `/api/v1/interest/cancel/:receiverId` | Cancel interest |
-| GET | `/api/v1/interest/sent` | Get sent interests |
-| GET | `/api/v1/interest/received` | Get received interests |
 
-### Ignore List
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/ignore` | Ignore a user |
-| DELETE | `/api/v1/ignore/unignore` | Unignore a user |
-| GET | `/api/v1/ignore` | Get ignored users |
+#### Send Interest
+```http
+POST /api/v1/interest/send?receiverId=:receiverId
+Authorization: Bearer <token>
+```
 
-### Profile Visit Tracking
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/profile-visit/:biodataId` | View contact info |
-| GET | `/api/v1/profile-visit/profile-view-status` | Get profile view status |
+#### Cancel Interest
+```http
+PATCH /api/v1/interest/cancel/:receiverId
+Authorization: Bearer <token>
+```
 
-### Payment & Subscription
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/payment/create` | Create payment |
-| PUT | `/api/v1/payment/approve/:id` | Approve payment (Admin) |
-| GET | `/api/v1/payment/all` | Get all payments (Admin) |
-| POST | `/api/v1/subscription/create` | Create subscription |
-| PATCH | `/api/v1/subscription/activate/:id` | Activate subscription (Admin) |
-| GET | `/api/v1/subscription/all` | Get all subscriptions (Admin) |
-| GET | `/api/v1/subscription/:id` | Get subscription by ID (Admin) |
+### Payment Management
+
+#### Create Payment
+```http
+POST /api/v1/payment/create
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "subscriptionType": "premium",
+  "durationInMonths": 2,
+  "amount": 500,
+  "name": "Sanjid Alom",
+  "paidAmount": 500
+}
+```
+
+#### Approve Payment (Admin)
+```http
+PATCH /api/v1/payment/approve/:paymentId
+Authorization: Bearer <token>
+```
+
+### Profile Visit
+
+#### Record Contact Visit
+```http
+POST /api/v1/contact-visit/:userId
+Authorization: Bearer <token>
+```
+
+### Ignore Users
+
+#### Ignore a User
+```http
+POST /api/v1/ignore?ignoredUserId=:userId
+Authorization: Bearer <token>
+```
+
+#### Unignore a User
+```http
+DELETE /api/v1/ignore/unignore?ignoredUserId=:userId
+Authorization: Bearer <token>
+```
 
 ### Reviews
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/reviews` | Create review |
-| GET | `/api/v1/reviews` | Get all approved reviews |
-| GET | `/api/v1/reviews/my-review` | Get user's reviews |
-| GET | `/api/v1/reviews/pending` | Get pending reviews (Admin) |
-| PUT | `/api/v1/reviews/approve/:reviewId` | Approve review (Admin) |
-| PUT | `/api/v1/reviews/update/:reviewId` | Update review |
-| DELETE | `/api/v1/reviews/delete/:reviewId` | Delete review |
 
-### Email Management
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/mail/send-single` | Send email to single user (Admin) |
-| POST | `/api/v1/mail/send-all` | Send email to all users (Admin) |
-| GET | `/api/v1/mail` | Get all sent emails (Admin) |
+#### Post Review
+```http
+POST /api/v1/review
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "rating": 4.5,
+  "comment": "User is very cooperative and friendly."
+}
+```
+
+#### Get All Reviews
+```http
+GET /api/v1/review
+```
+
+#### Get Pending Reviews (Admin)
+```http
+GET /api/v1/review/pending
+Authorization: Bearer <token>
+```
+
+#### Get Own Review
+```http
+GET /api/v1/review/my-review
+Authorization: Bearer <token>
+```
+
+#### Approve Review (Admin)
+```http
+PUT /api/v1/review/approve/:reviewId
+Authorization: Bearer <token>
+```
+
+#### Update Review
+```http
+PUT /api/v1/review/update/:reviewId
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "rating": 4,
+  "comment": "Updated comment"
+}
+```
+
+#### Delete Review
+```http
+DELETE /api/v1/review/delete/:reviewId
+Authorization: Bearer <token>
+```
+
+### Email Services
+
+#### Send Email to Single User (Admin)
+```http
+POST /api/v1/mail/send-single?email=user@example.com
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "subject": "Welcome to Nikah App",
+  "body": "Hello! Your account has been verified successfully."
+}
+```
+
+#### Send Email to All Users (Admin)
+```http
+POST /api/v1/mail/send-all
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "subject": "Newsletter",
+  "body": "Hello all verified users! This is an important update."
+}
+```
 
 ### Special Offers
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/special-offers` | Create offer (Admin) |
-| GET | `/api/v1/special-offers` | Get all active offers |
-| DELETE | `/api/v1/special-offers/:id` | Delete offer (Admin) |
 
-### Location Data
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/public/divisions` | Get all divisions |
-| GET | `/api/v1/public/divisions/:id` | Get division by ID |
-| GET | `/api/v1/public/districts` | Get all districts |
-| GET | `/api/v1/public/districts/:id` | Get district by ID |
-| GET | `/api/v1/public/upazilas` | Get all upazilas |
-| GET | `/api/v1/public/upazilas/:id` | Get upazila by ID |
+#### Create Special Offer (Admin)
+```http
+POST /api/v1/special-offers
+Authorization: Bearer <token>
+Content-Type: application/json
 
-## 🧪 Example API Calls
-
-### Register a new user
-```bash
-curl -X POST https://matrimony-server-v1.vercel.app/api/v1/users/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "John Doe",
-    "email": "john@example.com",
-    "password": "SecurePass123!",
-    "phone": "01712345678",
-    "gender": "male",
-    "agreeToPrivacy": true,
-    "agreeToTerms": true
-  }'
+{
+  "title": "November Premium Discount",
+  "description": "Get 30% off on all premium packages!",
+  "validTill": "2025-09-30T23:59:59.000Z"
+}
 ```
 
-### Login user
-```bash
-curl -X POST https://matrimony-server-v1.vercel.app/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "john@example.com",
-    "password": "SecurePass123!"
-  }'
+#### Delete Special Offer (Admin)
+```http
+DELETE /api/v1/special-offers/:offerId
+Authorization: Bearer <token>
 ```
 
-### Get all biodata (with filters)
-```bash
-curl -X GET "https://matrimony-server-v1.vercel.app/api/v1/biodata/all?gender=male&minAge=25&maxAge=35&division=Dhaka" \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+### Newsletter
+
+#### Subscribe to Newsletter
+```http
+POST /api/v1/subscriber
+Content-Type: application/json
+
+{
+  "email": "user@example.com"
+}
 ```
 
-## 📊 Database Schema
+#### Get All Subscribers (Admin)
+```http
+GET /api/v1/subscriber
+Authorization: Bearer <token>
+```
 
-### Key Collections
+### Contact Us
 
-#### Users
-- User authentication and profile information
-- Subscription status and type
-- Role-based permissions
+#### Submit Contact Form
+```http
+POST /api/v1/contactUs
+Content-Type: application/json
 
-#### Biodata
-- Comprehensive user profiles with personal, family, education, and preference details
-- Approval status management
-- Advanced filtering capabilities
+{
+  "email": "user@example.com",
+  "subject": "Test Contact",
+  "body": "Hello Admin, this is a test message!"
+}
+```
 
-#### Subscriptions
-- Subscription type (Free, Premium, VIP)
-- Duration and limits management
-- Status tracking
+### Shortlist
 
-#### Interests
-- User interest tracking
-- Status management (sent/cancelled)
+#### Add to Shortlist
+```http
+POST /api/v1/shortList/:userId
+Authorization: Bearer <token>
+```
 
-#### Reviews
-- User feedback system
-- Rating and comment management
+## Data Models
 
-#### Payments
-- Payment processing records
-- Integration with subscription system
+### User Schema
+```typescript
+{
+  name: string
+  email: string
+  password: string (hashed)
+  phone: string
+  picture?: string
+  address: string
+  gender: "male" | "female"
+  role: "user" | "admin"
+  hasBiodata: boolean
+  subscriptionType: "free" | "premium" | "vip"
+  agreeToPrivacy: boolean
+  agreeToTerms: boolean
+}
+```
 
-## 🔐 Security Features
+### Biodata Schema
+```typescript
+{
+  userId: ObjectId
+  name: string
+  gender: "male" | "female"
+  age: number
+  address: {
+    present: AddressDetail
+    permanent: AddressDetail
+    grewUpAt: string
+    country: string
+  }
+  education: {
+    method: string
+    history: EducationHistory[]
+    other?: string[]
+  }
+  family: FamilyInfo
+  personal: PersonalInfo
+  occupation: OccupationInfo
+  marriage: MarriageInfo
+  preference: PreferenceInfo
+  pledge: PledgeInfo
+  status: "pending" | "approved" | "rejected"
+}
+```
+
+## Subscription Tiers
+
+| Feature | Free | Premium | VIP |
+|---------|------|---------|-----|
+| Profile Creation | ✓ | ✓ | ✓ |
+| Basic Search | ✓ | ✓ | ✓ |
+| Send Interest | ✗ | ✓ | ✓ |
+| View Contact Info | Limited | 100 profiles | 300 profiles |
+| Advanced Filters | ✗ | ✓ | ✓ |
+| Priority Support | ✗ | ✗ | ✓ |
+
+## Error Handling
+
+The API returns standard HTTP status codes:
+
+- `200` - Success
+- `201` - Created
+- `400` - Bad Request
+- `401` - Unauthorized
+- `403` - Forbidden
+- `404` - Not Found
+- `500` - Internal Server Error
+
+Error Response Format:
+```json
+{
+  "success": false,
+  "message": "Error message description"
+}
+```
+
+## Security Features
 
 - JWT token-based authentication
 - Password encryption using bcrypt
@@ -316,25 +633,7 @@ curl -X GET "https://matrimony-server-v1.vercel.app/api/v1/biodata/all?gender=ma
 - Rate limiting and security headers
 - Environment variable configuration
 
-## 🚦 Subscription Tiers
-
-| Feature | Free | Premium | VIP |
-|---------|------|---------|-----|
-| Profile Creation | ✅ | ✅ | ✅ |
-| Basic Search | ✅ | ✅ | ✅ |
-| Send Interest | ❌ | ✅ | ✅ |
-| View Contact Info | Limited | 100 profiles | 300 profiles |
-| Advanced Filters | ❌ | ✅ | ✅ |
-| Priority Support | ❌ | ❌ | ✅ |
-
-## 📞 Support
-
-For support and queries, please contact the development team or create an issue in the repository.
-
-
-
-
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 src/
@@ -356,6 +655,30 @@ src/
 └── types/               # TypeScript type definitions
 ```
 
+## Getting Started
+
+1. Set up your environment variables
+2. Configure the database connection
+3. Register a new user account
+4. Login to receive JWT token
+5. Use the token for authenticated requests
+
+## Notes
+
+- All dates should be in ISO 8601 format
+- File uploads should be handled via external services (URLs only)
+- JWT tokens expire after 7 days
+- Admin endpoints require admin role authentication
+- All passwords must meet minimum security requirements
+
+## Support
+
+For support and queries, please use the Contact Us endpoint or reach out to the development team.
+
+## License
+
+This project is licensed under the MIT License.
+
 ---
 
-**Happy Coding! 💝**
+**Built with ❤️ for connecting hearts**

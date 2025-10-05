@@ -162,6 +162,7 @@ const biodataSchema = new Schema<IBiodata>(
       brothers: { type: Number, default: 0 },
       sisters: { type: Number, default: 0 },
       sistersInfo: [{ type: String }],
+      brothersInfo: [{ type: String }],
       unclesProfession: [{ type: String }],
       financialStatus: { type: String, default: "উত্তর দেয়া হয়নি" },
       financialDetails: { type: String, default: "উত্তর দেয়া হয়নি" },
@@ -178,6 +179,8 @@ const biodataSchema = new Schema<IBiodata>(
       healthIssues: { type:String, default: false },
       specialSkills: { type: String, default: "উত্তর দেয়া হয়নি" },
       favoriteBooks: [{ type: String }],
+      height:{type:String, default: "উত্তর দেয়া হয়নি" },
+      maritalStatus :{type:String, default: "উত্তর দেয়া হয়নি" },
       hobbies: [{ type: String }],
     },
 
@@ -192,7 +195,7 @@ const biodataSchema = new Schema<IBiodata>(
 
     marriage: {
       guardiansAgree: { type: Schema.Types.Mixed, default: false },
-      studyContinue: {type:Boolean, default: null },
+      studyContinue: {type:String, default: null },
       reason: { type: String, default: "উত্তর দেয়া হয়নি" },
       jobStatus: { type: String, default: "উত্তর দেয়া হয়নি" },
     },
