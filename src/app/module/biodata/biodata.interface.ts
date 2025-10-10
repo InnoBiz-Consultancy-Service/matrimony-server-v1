@@ -202,6 +202,12 @@ export interface IBiodata {
     qualities?: string[];
   };
 
+    contactInfo?: {
+    guardianPhone?: number | string;
+    relation?: string;
+  };
+
+
   pledge?: {
     parentsAware?: boolean | string;
     informationAccurate?: boolean | string;
