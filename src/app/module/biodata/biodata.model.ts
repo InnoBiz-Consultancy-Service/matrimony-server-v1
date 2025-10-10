@@ -115,11 +115,10 @@ import { string } from "zod";
 const biodataSchema = new Schema<IBiodata>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    phone:{type:String,ref:"User"},
+    phone: { type: String, ref: "User" },
     name: { type: String, required: true },
     gender: { type: String, enum: ["male", "female"], required: true },
     age: { type: Number, required: true },
-
 
     address: {
       present: {
@@ -151,7 +150,6 @@ const biodataSchema = new Schema<IBiodata>(
         },
       ],
       other: [{ type: String }],
-     
     },
 
     family: {
@@ -173,14 +171,14 @@ const biodataSchema = new Schema<IBiodata>(
       dress: { type: String, default: "উত্তর দেয়া হয়নি" },
       prayerHabit: { type: String, default: "উত্তর দেয়া হয়নি" },
       maintainMahram: { type: String, default: false },
-      quranReading: { type: String,default: false },
+      quranReading: { type: String, default: false },
       fiqh: { type: String, default: "উত্তর দেয়া হয়নি" },
       entertainment: { type: String, default: false },
-      healthIssues: { type:String, default: false },
+      healthIssues: { type: String, default: false },
       specialSkills: { type: String, default: "উত্তর দেয়া হয়নি" },
       favoriteBooks: [{ type: String }],
-      height:{type:String, default: "উত্তর দেয়া হয়নি" },
-      maritalStatus :{type:String, default: "উত্তর দেয়া হয়নি" },
+      height: { type: String, default: "উত্তর দেয়া হয়নি" },
+      maritalStatus: { type: String, default: "উত্তর দেয়া হয়নি" },
       hobbies: [{ type: String }],
     },
 
@@ -195,7 +193,7 @@ const biodataSchema = new Schema<IBiodata>(
 
     marriage: {
       guardiansAgree: { type: Schema.Types.Mixed, default: false },
-      studyContinue: {type:String, default: null },
+      studyContinue: { type: String, default: null },
       reason: { type: String, default: "উত্তর দেয়া হয়নি" },
       jobStatus: { type: String, default: "উত্তর দেয়া হয়নি" },
     },
@@ -211,7 +209,17 @@ const biodataSchema = new Schema<IBiodata>(
       financialCondition: { type: String, default: "উত্তর দেয়া হয়নি" },
       qualities: [{ type: String }],
     },
-    isApproved: { type: String, enum: ApprovalStatus, default: ApprovalStatus.PENDING },
+    isApproved: {
+      type: String,
+      enum: ApprovalStatus,
+      default: ApprovalStatus.PENDING,
+    },
+
+    contactInfo: {
+      guardianPhone: { type: String, default: "উত্তর দেয়া হয়নি" },
+      relation: { type: String, default: "উত্তর দেয়া হয়নি" },
+    },
+
     pledge: {
       parentsAware: { type: Schema.Types.Mixed, default: false },
       informationAccurate: { type: Schema.Types.Mixed, default: false },
