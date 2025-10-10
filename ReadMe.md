@@ -2,7 +2,7 @@
 
 A comprehensive backend API for a matrimonial website built with Node.js, Express.js, TypeScript, and MongoDB. This platform facilitates matchmaking by allowing users to create detailed biodata profiles, search for compatible matches, and manage subscriptions for premium features.
 
-## 🚀 Features
+## Features
 
 ### Authentication & Authorization
 - User registration and login with JWT authentication
@@ -14,20 +14,13 @@ A comprehensive backend API for a matrimonial website built with Node.js, Expres
 ### User Management
 - User profile creation and verification
 - Admin user management
-- Email verification system
+- Profile completion tracking
 
 ### Biodata Management
-- Comprehensive biodata creation with multiple sections:
-  - Personal information
-  - Address details (Present/Permanent)
-  - Education history
-  - Family information
-  - Personal preferences
-  - Occupation details
-  - Marriage preferences
-  - Partner preferences
+- Comprehensive biodata creation with multiple sections including personal information, address details, education history, family information, occupation details, and marriage preferences
 - Biodata approval system by admin
 - Advanced filtering and search capabilities
+- Profile status tracking (pending/approved)
 
 ### Subscription & Payment System
 - Multiple subscription tiers (Free, Premium, VIP)
@@ -36,9 +29,10 @@ A comprehensive backend API for a matrimonial website built with Node.js, Expres
 - Subscription management and expiration handling
 
 ### Interest & Interaction System
-- Send/cancel interest to other profiles
+- Send and cancel interest to other profiles
 - Track sent and received interests
-- Ignore/unignore user functionality
+- Ignore and unignore user functionality
+- Shortlist profiles for later review
 
 ### Profile Visit Tracking
 - Track profile visits and contact info views
@@ -48,24 +42,25 @@ A comprehensive backend API for a matrimonial website built with Node.js, Expres
 ### Review System
 - User reviews with rating system
 - Admin approval for reviews
-- Review management (CRUD operations)
+- Complete review management (CRUD operations)
 
 ### Communication
 - Admin email broadcast system
 - Individual user email communication
-- Email templates and tracking
+- Newsletter subscription management
+- Contact form for user inquiries
 
 ### Special Offers
 - Admin-managed special offers
 - Time-based offer validity
-- Offer activation/deactivation
+- Dynamic pricing and promotions
 
 ### Location Management
 - Bangladesh administrative divisions integration
 - Division, District, and Upazila data
 - Location-based filtering
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend**: Node.js, Express.js
 - **Language**: TypeScript
@@ -76,13 +71,13 @@ A comprehensive backend API for a matrimonial website built with Node.js, Expres
 - **Validation**: Zod
 - **Security**: bcrypt for password hashing
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js (v14 or higher)
 - MongoDB (v4 or higher)
 - npm or yarn package manager
 
-## ⚙️ Installation
+## Installation
 
 1. **Clone the repository**
    ```bash
@@ -142,6 +137,30 @@ Developed by Nikah.com Team
 
 yaml
 Copy code
+
+## Getting Started
+
+1. Set up your environment variables
+2. Configure the database connection
+3. Register a new user account
+4. Login to receive JWT token
+5. Use the token for authenticated requests
+
+## Notes
+
+- All dates should be in ISO 8601 format
+- File uploads should be handled via external services (URLs only)
+- JWT tokens expire after 7 days
+- Admin endpoints require admin role authentication
+- All passwords must meet minimum security requirements
+
+## Support
+
+For support and queries, please use the Contact Us endpoint or reach out to the development team.
+
+## License
+
+This project is licensed under the MIT License.
 
 ---
 
