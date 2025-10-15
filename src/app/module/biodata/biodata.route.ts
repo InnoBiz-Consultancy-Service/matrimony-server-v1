@@ -21,7 +21,7 @@ router.get("/:id", BiodataControllers.getBiodataById);
 
 router.patch("/approval/:id", checkAuth(USER_ROLE.ADMIN), BiodataControllers.approveOrRejectBiodata);
 
-// Admin delete any user's biodata
+// Admin delete any users biodata
 router.delete(
   "/admin/:id",
   checkAuth(USER_ROLE.ADMIN),
