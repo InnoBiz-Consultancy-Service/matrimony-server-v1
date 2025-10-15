@@ -140,14 +140,41 @@ const getPendingBiodata = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+// Admin delete any user's biodata
+const adminDeleteBiodata = catchAsync(async (req: Request, res: Response) => {
+  const biodataId = req.params.id;
+
+  const trashedBiodata = await BiodataServices.adminDeleteBiodata(biodataId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Biodata deleted by admin successfully",
+    data: trashedBiodata,
+  });
+});
+
+// Admin get all biodata
+const getAllBiodataAdmin = catchAsync(async (req: Request, res: Response) => {
+  const result = await BiodataServices.getAllBiodataAdmin();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "All biodata fetched successfully (admin)",
+    data: result,
+  });
+});
 
 export const BiodataControllers = {
   createOrUpdateBiodata,
   updateOwnBiodata,
-  deleteOwnBiodata, // ✅ added
+  deleteOwnBiodata, 
   getAllBiodata,
   getOwnBiodata,
   getBiodataById,
   approveOrRejectBiodata,
   getPendingBiodata,
+  adminDeleteBiodata ,
+  getAllBiodataAdmin
 };
