@@ -258,6 +258,25 @@ const deleteOwnBiodata = async (userId: string) => {
 
   return trashed;
 };
+// Admin get all biodata (any status)
+const getAllBiodataAdmin = async () => {
+  return await Biodata.find({}).populate("userId"); // full user document
+};
+// Admin delete any user's biodata
+const adminDeleteBiodata = async (biodataId: string) => {
+  const biodata = await Biodata.findById(biodataId);
+  if (!biodata) throw new Error("Biodata not found");
+
+  const trashed = new Trash({
+    data: JSON.parse(JSON.stringify(biodata)),
+    deletedAt: new Date(),
+  });
+  await trashed.save();
+
+  await Biodata.findByIdAndDelete(biodataId);
+
+  return trashed;
+};
 
 export const BiodataServices = {
   createBiodata,
@@ -268,4 +287,6 @@ export const BiodataServices = {
   getPendingBiodata,
   getOwnBiodata,
   deleteOwnBiodata, 
+  getAllBiodataAdmin,
+  adminDeleteBiodata
 };

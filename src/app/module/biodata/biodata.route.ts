@@ -21,6 +21,18 @@ router.get("/:id", BiodataControllers.getBiodataById);
 
 router.patch("/approval/:id", checkAuth(USER_ROLE.ADMIN), BiodataControllers.approveOrRejectBiodata);
 
+// Admin delete any user's biodata
+router.delete(
+  "/admin/:id",
+  checkAuth(USER_ROLE.ADMIN),
+  BiodataControllers.adminDeleteBiodata
+);
 
+// Admin get all biodata (approved + pending + rejected)
+router.get(
+  "/admin/all",
+  checkAuth(USER_ROLE.ADMIN),
+  BiodataControllers.getAllBiodataAdmin
+);
 
 export const BiodataRoutes = router;
